@@ -7,23 +7,6 @@
 #include <string>
 #include <stdexcept>
 
-namespace Textures
-{
-	enum class ID : int
-	{
-		Landscape,
-		Airplane,
-		Missile
-	};
-}
-
-namespace Fonts
-{
-	enum class ID : int
-	{
-		Sansation
-	};
-}
 
 template <typename Resource, typename Identifier>
 class ResourceHolder
