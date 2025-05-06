@@ -2,8 +2,8 @@
 
 SceneNode::SceneNode() 
 	: mChildren()
-, mParent(nullptr) {}
-
+	, mParent(nullptr) 
+{}
 
 void SceneNode::attachChild(Ptr child) 
 {
@@ -15,7 +15,6 @@ SceneNode::Ptr SceneNode::detachChild(const SceneNode& node)
 {
 	auto found = std::find_if(mChildren.begin(), mChildren.end(), 
 		[&](Ptr& p) -> bool { return p.get() == &node; });
-
 	assert(found != mChildren.end());
 
 	Ptr result = std::move(*found);
@@ -66,7 +65,6 @@ void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) 
 
 void SceneNode::updateCurrent(sf::Time dt) 
 {}
-
 
 void SceneNode::updateChildren(sf::Time dt) 
 {

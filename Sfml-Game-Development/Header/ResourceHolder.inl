@@ -26,7 +26,7 @@ template <typename Resource, typename Identifier>
 void ResourceHolder<Resource, Identifier>::open(Identifier id, const std::string& filename) {
 	std::unique_ptr<Resource> resource(new Resource());
 	if (!resource->openFromFile(filename)) {
-		throw std::runtime_error("ResourceHolder::load - Failed to load " + filename);
+		throw std::runtime_error("ResourceHolder::open - Failed to load " + filename);
 	}
 
 	insertResource(id, std::move(resource));

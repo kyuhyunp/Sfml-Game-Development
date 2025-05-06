@@ -14,7 +14,8 @@ namespace Textures
 	enum class ID : int
 	{
 		Eagle,
-		Raptor
+		Raptor,
+		Desert
 	};
 }
 

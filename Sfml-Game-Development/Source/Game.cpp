@@ -7,32 +7,14 @@
 const float Game::PlayerSpeed = 100.f;
 const sf::Time Game::TimePerFrame = sf::seconds(1.f/60.f);
 
-Game::Game()
-	: mWindow(sf::VideoMode({ 640, 480 }), "SFML Application", sf::Style::Close)
-, mTexture()
-, mPlayer(mTexture)
-, mFont()
-, mStatisticsText(mFont)
-, mStatisticsUpdateTime()
-, mStatisticsNumFrames(0)
-, mIsMovingUp(false)
-, mIsMovingDown(false)
-, mIsMovingRight(false)
-, mIsMovingLeft(false)
+Game::Game(const FontHolder& fonts)
+	: mWindow(sf::VideoMode({ 640, 480 }), "World", sf::Style::Close)
+	, mWorld(mWindow)
+	, mFonts(fonts)
+	, mStatisticsText(fonts.get(Fonts::ID::Sansation))
+	, mStatisticsUpdateTime()
+	, mStatisticsNumFrames(0)
 {
-	if (!mTexture.loadFromFile("Media/Textures/Eagle.png"))
-	{
-		throw std::runtime_error("Error while opening Media/Textures/Eagle.png");
-	}
-
-	mPlayer.setTexture(mTexture, true);
-	mPlayer.setPosition({ 100.f, 100.f });
-	
-	if (!mFont.openFromFile("Media/Sansation.ttf"))
-	{
-		throw std::runtime_error("Error while opening Media/Textures/Eagle.png");
-	}
-	mStatisticsText.setFont(mFont);
 	mStatisticsText.setPosition({ 5.f, 5.f });
 	mStatisticsText.setCharacterSize(10);
 }
@@ -62,39 +44,35 @@ void Game::processEvents()
 {
 	while (const std::optional event = mWindow.pollEvent())
 	{
-		if (event->is< sf::Event::Closed>()){
+		if (event->is< sf::Event::Closed>())
+		{
 			mWindow.close();
-			return;
+			break;
 		}
-
-		if (const auto * keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+		else if (const auto * keyPressed = event->getIf<sf::Event::KeyPressed>()) 
+		{
 			handlePlayerInput(keyPressed->code, true);
+			break;
 		}
-		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) 
+		{
 			handlePlayerInput(keyReleased->code, false);
+			break;
 		} 
 	}
 }
 
 void Game::update(sf::Time elapsedTime)
 {
-	sf::Vector2f movement(0.f, 0.f);
-	if (mIsMovingUp)
-		movement.y -= PlayerSpeed;
-	if (mIsMovingDown)
-		movement.y += PlayerSpeed;
-	if (mIsMovingLeft)
-		movement.x -= PlayerSpeed;
-	if (mIsMovingRight)
-		movement.x += PlayerSpeed;
-		
-	mPlayer.move(movement * elapsedTime.asSeconds());
+	mWorld.update(elapsedTime);
 }
 
 void Game::render()
 {
 	mWindow.clear();	
-	mWindow.draw(mPlayer);
+	mWorld.draw();
+
+	mWindow.setView(mWindow.getDefaultView());
 	mWindow.draw(mStatisticsText);
 	mWindow.display();
 }
@@ -116,13 +94,5 @@ void Game::updateStatistics(sf::Time elapsedTime)
 }
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
-{	
-	if (key == sf::Keyboard::Key::W)
-		mIsMovingUp = isPressed;
-	else if (key == sf::Keyboard::Key::S)
-		mIsMovingDown = isPressed;
-	else if (key == sf::Keyboard::Key::A)
-		mIsMovingLeft = isPressed;
-	else if (key == sf::Keyboard::Key::D)
-		mIsMovingRight = isPressed;
+{
 }

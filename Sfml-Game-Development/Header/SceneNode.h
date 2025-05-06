@@ -6,7 +6,7 @@
 #include <cassert>
 #include <SFML/Graphics.hpp>
 
-class SceneNode : public sf::Drawable, public sf::Transformable
+class SceneNode : public sf::Transformable, public sf::Drawable
 {
 public:
 	typedef std::unique_ptr<SceneNode> Ptr;
@@ -23,9 +23,9 @@ public:
 
 	void update(sf::Time dt);
 
-	sf::Transform getWorldTransform() const;
-
 	sf::Vector2f getWorldPosition() const;
+
+	sf::Transform getWorldTransform() const;
 
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

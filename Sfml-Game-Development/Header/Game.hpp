@@ -1,6 +1,7 @@
 #ifndef BOOK_GAME_HPP
 #define BOOK_GAME_HPP
 
+#include "World.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -11,7 +12,7 @@ class Game
 								Game(const Game&) = delete;
 								Game& operator=(const Game&) = delete;
 
-								Game();
+								Game(const FontHolder& fonts);
 		void					run();
 
 		
@@ -30,17 +31,11 @@ class Game
 		static const sf::Time	TimePerFrame;
 
 		sf::RenderWindow		mWindow;
-		sf::Texture				mTexture;
-		sf::Sprite				mPlayer;
-		sf::Font				mFont;
+		World					mWorld;
+		const FontHolder&		mFonts;
 		sf::Text				mStatisticsText;
 		sf::Time				mStatisticsUpdateTime;
-
 		std::size_t				mStatisticsNumFrames;
-		bool					mIsMovingUp;
-		bool					mIsMovingDown;
-		bool					mIsMovingRight;
-		bool					mIsMovingLeft;
 };
 
 #endif // BOOK_GAME_HPP
