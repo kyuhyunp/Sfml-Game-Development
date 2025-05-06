@@ -14,7 +14,7 @@ Textures::ID toTextureID(Aircraft::Type type)
 	return Textures::ID::Eagle;
 }
 
-Aircraft::Aircraft(Type type, const ResourceHolder<sf::Texture, Textures::ID>& textures): 
+Aircraft::Aircraft(Type type, const TextureHolder& textures): 
 	mType(type), mSprite(textures.get(toTextureID(type))) 
 {
 	sf::FloatRect origin = mSprite.getLocalBounds();
