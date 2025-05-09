@@ -31,7 +31,7 @@ void Game::run()
 		{
 			timeSinceLastUpdate -= TimePerFrame;
 
-			processEvents();
+			processInput();
 			update(TimePerFrame);
 		}
 
@@ -40,26 +40,25 @@ void Game::run()
 	}
 }
 
-void Game::processEvents()
+void Game::processInput()
 {
+	CommandQueue& commands = mWorld.getCommandQueue();
 	while (const std::optional event = mWindow.pollEvent())
 	{
+		if (!event.has_value())
+		{
+			continue;
+		}
+
+		mPlayer.handleEvent(event.value(), commands);
+
 		if (event->is< sf::Event::Closed>())
 		{
 			mWindow.close();
-			break;
 		}
-		else if (const auto * keyPressed = event->getIf<sf::Event::KeyPressed>()) 
-		{
-			handlePlayerInput(keyPressed->code, true);
-			break;
-		}
-		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) 
-		{
-			handlePlayerInput(keyReleased->code, false);
-			break;
-		} 
 	}
+
+	mPlayer.handleRealtimeInput(commands);
 }
 
 void Game::update(sf::Time elapsedTime)
@@ -95,4 +94,5 @@ void Game::updateStatistics(sf::Time elapsedTime)
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 {
+
 }
