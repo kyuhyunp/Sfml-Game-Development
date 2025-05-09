@@ -7,11 +7,13 @@
 #include "Aircraft.h"
 #include "SpriteNode.h"
 #include "SceneNode.h"
+#include "CommandQueue.h"
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
 #include <array>
+#include <algorithm>
 
 namespace sf
 {
@@ -30,9 +32,13 @@ public:
 	void update(sf::Time dt);
 	void draw();
 
+	CommandQueue& getCommandQueue();
+
 private:
 	void loadTextures();
 	void buildScene();
+	void adaptPlayerVelocity();
+	void adaptPlayerPosition();
 
 	enum Layer {
 		Background,
@@ -45,6 +51,7 @@ private:
 	TextureHolder mTextures;
 	SceneNode mSceneGraph;
 	std::array<SceneNode*, LayerCount> mSceneLayers;
+	CommandQueue mCommandQueue;
 
 	sf::FloatRect mWorldBounds;
 	sf::Vector2f mSpawnPosition;

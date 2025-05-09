@@ -2,6 +2,7 @@
 #define BOOK_GAME_HPP
 
 #include "World.h"
+#include "Player.h"
 #include <SFML/Graphics.hpp>
 
 
@@ -18,6 +19,7 @@ class Game
 		
 
 	private:
+		void					processInput();
 		void					processEvents();
 		void					update(sf::Time elapsedTime);
 		void					render();
@@ -33,6 +35,7 @@ class Game
 		sf::RenderWindow		mWindow;
 		World					mWorld;
 		const FontHolder&		mFonts;
+		Player					mPlayer;
 		sf::Text				mStatisticsText;
 		sf::Time				mStatisticsUpdateTime;
 		std::size_t				mStatisticsNumFrames;
