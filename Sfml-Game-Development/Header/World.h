@@ -1,7 +1,6 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-
 #include "ResourceHolder.hpp"
 #include "ResourceIdentifiers.h"
 #include "Aircraft.h"

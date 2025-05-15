@@ -1,9 +1,9 @@
-#include "Header/Game.hpp"
+#include "Header/Application.h"
 #include "Header/ResourceHolder.hpp"
 #include "Header/ResourceIdentifiers.h"
 
 #include <iostream>
-#include <SFML/Graphics.hpp>
+#include <stdexcept>
 
 
 int main()
@@ -12,9 +12,8 @@ int main()
 	{
 		FontHolder fonts;
 		fonts.open(Fonts::ID::Sansation, "Media/Sansation.ttf");
-
-		Game game(fonts);
-		game.run();
+		Application app(fonts);
+		app.run();
 	}
 	catch (std::exception& e)
 	{
