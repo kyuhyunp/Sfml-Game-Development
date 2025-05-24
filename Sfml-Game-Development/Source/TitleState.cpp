@@ -39,7 +39,7 @@ bool TitleState::update(sf::Time dt)
 
 bool TitleState::handleEvent(const sf::Event& event)
 {
-	if (event.getIf<sf::Event::KeyPressed>())
+	if (event.getIf<sf::Event::KeyReleased>())
 	{
 		requestStackPop();
 		requestStackPush(States::Menu);

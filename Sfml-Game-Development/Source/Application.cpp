@@ -16,6 +16,9 @@ Application::Application(FontHolder& fonts)
 	mWindow.setKeyRepeatEnabled(false);
 
 	mTextures.load(Textures::ID::TitleScreen, "Media/Textures/TitleScreen.png");
+	mTextures.load(Textures::ID::ButtonNormal, "Media/Textures/ButtonNormal.png");
+	mTextures.load(Textures::ID::ButtonSelected, "Media/Textures/ButtonSelected.png");
+	mTextures.load(Textures::ID::ButtonPressed, "Media/Textures/ButtonPressed.png");
 
 	mStatisticsText.setPosition({ 5.f, 5.f });
 	mStatisticsText.setCharacterSize(10u);
@@ -106,4 +109,5 @@ void Application::registerStates()
 	mStateStack.registerState<MenuState>(States::Menu);
 	mStateStack.registerState<GameState>(States::Game);
 	mStateStack.registerState<PauseState>(States::Pause);
+	mStateStack.registerState<SettingsState>(States::Settings);
 }

@@ -44,7 +44,6 @@ void Player::handleEvent(const sf::Event& event, CommandQueue& commands)
 
 void Player::handleRealtimeInput(CommandQueue& commands) 
 {
-	//iterate through the key, action map and check that the key is pressed and action is realtime action
 	for (auto pair : mKeyBinding)
 	{
 		if (sf::Keyboard::isKeyPressed(pair.first) && isRealtimeAction(pair.second))
