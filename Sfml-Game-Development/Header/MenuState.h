@@ -2,13 +2,10 @@
 #define MENU_STATE_H
 
 #include "State.h"
-#include "Utility.hpp"
-#include "ResourceHolder.hpp"
+#include "Container.h"
 
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/View.hpp>
+
 
 class MenuState : public State
 {
@@ -22,15 +19,8 @@ public:
 	void updateOptionText();
 	
 private:
-	enum OptionNames
-	{
-		Play,
-		Exit,
-	};
-
 	sf::Sprite mBackgroundSprite;
-	std::vector<sf::Text> mOptions; 
-	size_t mOptionIndex;
+	GUI::Container mGUIContainer;
 };
 
 #endif

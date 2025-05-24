@@ -1,8 +1,11 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 
+#include "Player.h"
+
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 #include <cmath>
 #include <sstream>
@@ -18,6 +21,7 @@ namespace sf
 // our own to support all platforms.
 template <typename T>
 std::string toString(const T& value);
+std::string toString(sf::Keyboard::Key key);
 
 void centerOrigin(sf::Sprite& sprite);
 void centerOrigin(sf::Text& text);

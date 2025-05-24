@@ -12,6 +12,7 @@
 #include "GameState.h"
 #include "MenuState.h"
 #include "PauseState.h"
+#include "SettingsState.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
