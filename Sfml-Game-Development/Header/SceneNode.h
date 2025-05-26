@@ -3,6 +3,7 @@
 
 #include "Category.h"
 #include "Command.h"
+#include "CommandQueue.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Transformable.hpp>

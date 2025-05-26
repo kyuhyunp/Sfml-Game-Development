@@ -22,7 +22,7 @@ namespace sf
 class World
 {
 public:
-	explicit World(sf::RenderWindow& window);
+	explicit World(sf::RenderWindow& window, FontHolder& fonts);
 
 	// Non copyable
 	World(const World&) = delete;
@@ -39,6 +39,8 @@ private:
 	void adaptPlayerVelocity();
 	void adaptPlayerPosition();
 
+	void addEnemies();
+
 	enum Layer {
 		Background,
 		Air,
@@ -48,6 +50,8 @@ private:
 	sf::RenderWindow& mWindow;
 	sf::View mWorldView;
 	TextureHolder mTextures;
+	FontHolder& mFonts;
+
 	SceneNode mSceneGraph;
 	std::array<SceneNode*, LayerCount> mSceneLayers;
 	CommandQueue mCommandQueue;
@@ -56,6 +60,8 @@ private:
 	sf::Vector2f mSpawnPosition;
 	float mScrollSpeed;
 	Aircraft* mPlayerAircraft;
+	Aircraft* mRaptor;
+	Aircraft* mAvenger;
 };
 
 #endif

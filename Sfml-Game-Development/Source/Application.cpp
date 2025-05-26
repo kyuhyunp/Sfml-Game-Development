@@ -89,8 +89,6 @@ void Application::render()
 	mWindow.display();
 }
 
-
-
 void Application::updateStatistics(sf::Time dt)
 {
 	mStatisticsUpdateTime += dt;

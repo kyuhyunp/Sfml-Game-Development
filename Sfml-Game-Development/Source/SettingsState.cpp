@@ -16,8 +16,6 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	addButtonLabel(Player::MoveDown, 300.f, "Move Down", context);
 
 	updateLabels();
-	/*const FontHolder& fonts = *context.fonts;
-	const TextureHolder& textures = *context.textures;*/
 
 	auto backButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
 	backButton->setPosition({ 80.f, 375.f });
@@ -43,9 +41,6 @@ bool SettingsState::update(sf::Time dt)
 
 bool SettingsState::handleEvent(const sf::Event& event)
 {
-	// Allow the Player to change keys 
-	// pressed (toggle) works
-	// Now, to set the key, you need to check if any button is toggled
 	Player& player = *getContext().player;
 
 	bool isKeyBinding = false;
