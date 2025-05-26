@@ -1,9 +1,10 @@
 #include "../Header/World.h"
 
-World::World(sf::RenderWindow& window)
+World::World(sf::RenderWindow& window, FontHolder& fonts)
 	: mWindow(window)
 	, mWorldView(window.getDefaultView())
 	, mTextures()
+	, mFonts(fonts)
 	, mSceneGraph()
 	, mSceneLayers()
 	, mWorldBounds({ 0.f, 0.f }, { mWorldView.getSize().x, 2000.f })
@@ -48,6 +49,7 @@ void World::loadTextures()
 {
 	mTextures.load(Textures::ID::Eagle, "Media/Textures/Eagle.png");
 	mTextures.load(Textures::ID::Raptor, "Media/Textures/Raptor.png");
+	mTextures.load(Textures::ID::Avenger, "Media/Textures/Avenger.png");
 	mTextures.load(Textures::ID::Desert, "Media/Textures/Desert.png");
 }
 
@@ -70,19 +72,13 @@ void World::buildScene()
 	mSceneLayers[Background]
 		->attachChild(std::move(backgroundSprite));
 
-	std::unique_ptr<Aircraft> leader(new Aircraft(Aircraft::Type::Eagle, mTextures));
-	mPlayerAircraft = leader.get();
+	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mFonts, mTextures));
+	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
-	mPlayerAircraft->setVelocity({ 40.f, mScrollSpeed });
-	mSceneLayers[Air]->attachChild(std::move(leader));
+	mPlayerAircraft->setVelocity({ 0.f, mScrollSpeed });
+	mSceneLayers[Air]->attachChild(std::move(player));
 
-	std::unique_ptr<Aircraft> leftEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
-	leftEscort->setPosition({ -80.f, 50.f });
-	mPlayerAircraft->attachChild(std::move(leftEscort));
-
-	std::unique_ptr<Aircraft> rightEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
-	rightEscort->setPosition({ 80.f, 50.f });
-	mPlayerAircraft->attachChild(std::move(rightEscort));
+	addEnemies();
 }
 
 void World::adaptPlayerVelocity() 
@@ -115,4 +111,19 @@ void World::adaptPlayerPosition()
 		viewBounds.position.y + viewBounds.size.y - borderDistance);
 	
 	mPlayerAircraft->setPosition(position);
+}
+
+void World::addEnemies()
+{
+	std::unique_ptr<Aircraft> raptor(new Aircraft(Aircraft::Raptor, mFonts, mTextures));
+	mRaptor = raptor.get();
+	mSceneLayers[Air]->attachChild(std::move(raptor));
+
+	mRaptor->setPosition({ mWorldView.getSize().x / 2.f, 1500});
+
+	std::unique_ptr<Aircraft> avenger(new Aircraft(Aircraft::Avenger, mFonts, mTextures));
+	mAvenger = avenger.get();
+	mSceneLayers[Air]->attachChild(std::move(avenger));
+
+	mAvenger->setPosition({ mWorldView.getSize().x / 2.f, 1000 });
 }

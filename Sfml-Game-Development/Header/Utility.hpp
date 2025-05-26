@@ -26,5 +26,8 @@ std::string toString(sf::Keyboard::Key key);
 void centerOrigin(sf::Sprite& sprite);
 void centerOrigin(sf::Text& text);
 
+float toDegree(float radian);
+float toRadian(float degree);
+
 #include "Utility.inl"
 #endif // BOOK_STRINGHELPERS_HPP

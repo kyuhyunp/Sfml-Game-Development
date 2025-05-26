@@ -4,8 +4,8 @@
 #include "State.h"
 #include "Container.h"
 #include "Player.h"
-#include "../Header/Button.h"
-#include "../Header/Label.h"
+#include "Button.h"
+#include "Label.h"
 
 #include <SFML/Graphics/Sprite.hpp>
 
