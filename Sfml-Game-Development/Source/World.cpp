@@ -7,11 +7,13 @@ World::World(sf::RenderWindow& window, FontHolder& fonts)
 	, mFonts(fonts)
 	, mSceneGraph()
 	, mSceneLayers()
+	, mCommandQueue()
 	, mWorldBounds({ 0.f, 0.f }, { mWorldView.getSize().x, 2000.f })
 	, mSpawnPosition(mWorldView.getSize().x / 2.f, 
 		mWorldBounds.size.y - mWorldView.getSize().y / 2.f)
 	, mScrollSpeed(-50.f)
 	, mPlayerAircraft(nullptr)
+	, mEnemySpawnPoints()
 {
 	loadTextures();
 	buildScene();
@@ -30,6 +32,9 @@ void World::update(sf::Time dt)
 	}
 
 	adaptPlayerVelocity();
+
+	spawnEnemies();
+
 	mSceneGraph.update(dt);
 	adaptPlayerPosition();
 }
@@ -75,7 +80,6 @@ void World::buildScene()
 	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mFonts, mTextures));
 	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
-	mPlayerAircraft->setVelocity({ 0.f, mScrollSpeed });
 	mSceneLayers[Air]->attachChild(std::move(player));
 
 	addEnemies();
@@ -115,15 +119,56 @@ void World::adaptPlayerPosition()
 
 void World::addEnemies()
 {
-	std::unique_ptr<Aircraft> raptor(new Aircraft(Aircraft::Raptor, mFonts, mTextures));
-	mRaptor = raptor.get();
-	mSceneLayers[Air]->attachChild(std::move(raptor));
+	addEnemy(Aircraft::Raptor, 0.f, 500.f);
+	addEnemy(Aircraft::Raptor, 0.f, 1000.f);
+	addEnemy(Aircraft::Raptor, +100.f, 1100.f);
+	addEnemy(Aircraft::Raptor, -100.f, 1100.f);
+	addEnemy(Aircraft::Avenger, -70.f, 1400.f);
+	addEnemy(Aircraft::Avenger, -70.f, 1600.f);
+	addEnemy(Aircraft::Avenger, 70.f, 1400.f);
+	addEnemy(Aircraft::Avenger, 70.f, 1600.f);
 
-	mRaptor->setPosition({ mWorldView.getSize().x / 2.f, 1500});
+	std::sort(mEnemySpawnPoints.begin(), mEnemySpawnPoints.end(),
+		[](const SpawnPoint& lhs, const SpawnPoint& rhs)
+		{
+			return lhs.y < rhs.y;
+		});
+}
 
-	std::unique_ptr<Aircraft> avenger(new Aircraft(Aircraft::Avenger, mFonts, mTextures));
-	mAvenger = avenger.get();
-	mSceneLayers[Air]->attachChild(std::move(avenger));
+void World::addEnemy(Aircraft::Type type, float relX, float relY)
+{
+	mEnemySpawnPoints.emplace_back(
+		type, mSpawnPosition.x + relX, mSpawnPosition.y - relY);
+}
 
-	mAvenger->setPosition({ mWorldView.getSize().x / 2.f, 1000 });
+void World::spawnEnemies()
+{
+	while (!mEnemySpawnPoints.empty() && 
+		getBattlefieldBounds().position.y < mEnemySpawnPoints.back().y)
+	{
+		SpawnPoint spawn = mEnemySpawnPoints.back();
+
+		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.type, mFonts, mTextures));
+		enemy->setPosition({ spawn.x, spawn.y });
+		enemy->setRotation(sf::degrees(180.f));
+
+		mSceneLayers[Air]->attachChild(std::move(enemy));
+
+		mEnemySpawnPoints.pop_back();
+	}
+}
+
+sf::FloatRect World::getViewBounds() const
+{
+	return sf::FloatRect(mWorldView.getCenter() - mWorldView.getSize() / 2.f, 
+		mWorldView.getSize());
+}
+
+sf::FloatRect World::getBattlefieldBounds() const
+{
+	sf::FloatRect bounds = getViewBounds();
+	bounds.position.y -= 100.f;
+	bounds.size.y += 100.f;
+
+	return bounds;
 }
