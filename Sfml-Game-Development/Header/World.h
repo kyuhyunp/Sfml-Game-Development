@@ -35,16 +35,35 @@ public:
 
 private:
 	void loadTextures();
-	void buildScene();
 	void adaptPlayerVelocity();
 	void adaptPlayerPosition();
 
+	void buildScene();
 	void addEnemies();
+	void addEnemy(Aircraft::Type type, float relX, float relY);
+	void spawnEnemies();
+	sf::FloatRect getViewBounds() const;
+	sf::FloatRect getBattlefieldBounds() const;
 
-	enum Layer {
+	enum Layer 
+	{
 		Background,
 		Air,
 		LayerCount
+	};
+
+	struct SpawnPoint
+	{
+		SpawnPoint(Aircraft::Type type, float x, float y)
+			: type(type)
+			, x(x)
+			, y(y)
+		{
+		}
+
+		Aircraft::Type type;
+		float x;
+		float y;
 	};
 
 	sf::RenderWindow& mWindow;
@@ -60,8 +79,8 @@ private:
 	sf::Vector2f mSpawnPosition;
 	float mScrollSpeed;
 	Aircraft* mPlayerAircraft;
-	Aircraft* mRaptor;
-	Aircraft* mAvenger;
+
+	std::vector<SpawnPoint> mEnemySpawnPoints;
 };
 
 #endif
