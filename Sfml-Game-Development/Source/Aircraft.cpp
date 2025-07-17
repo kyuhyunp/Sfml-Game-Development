@@ -39,7 +39,6 @@ Aircraft::Aircraft(Type type, const FontHolder& fonts, const TextureHolder& text
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
 	, mHealthDisplay()
-	, counter(0)
 {
 	centerOrigin(mSprite);
 
@@ -100,7 +99,6 @@ float Aircraft::getMaxSpeed() const
 
 void Aircraft::fire()
 {
-	//if (Table[mType].)
 	mIsFiring = true;
 }
 
@@ -141,15 +139,26 @@ void Aircraft::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	if (mIsFiring && mFireCountdown <= sf::Time::Zero)
 	{
 		commands.push(mFireCommand);
+
+		assert(mFireRateLevel > 0);
 		mFireCountdown += sf::seconds(1.f / (mFireRateLevel + 1));
 		mIsFiring = false;
 	}
 	else if (mFireCountdown > sf::Time::Zero)
 	{
 		mFireCountdown -= dt;
-		// Chance of space bar pressed for the next dt
+		if (mFireCountdown < sf::Time::Zero)
+		{
+			mFireCountdown = sf::Time::Zero;
+		}
+		/*
+		* Without the below line, there is a chance of another bullet firing
+		* because there is a chance of space pressed for the next dt
+		*/
 		mIsFiring = false;
 	}
+
+
 
 	if (mIsLaunchingMissile)
 	{

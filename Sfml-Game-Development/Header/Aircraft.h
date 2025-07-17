@@ -56,8 +56,6 @@ private:
 	float mTravelledDistance;
 	size_t mDirectionIndex;
 	TextNode* mHealthDisplay;
-
-	int counter;
 };
 
 #endif
