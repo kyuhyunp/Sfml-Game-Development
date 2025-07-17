@@ -16,12 +16,13 @@
 #include <vector>
 #include <cassert>
 
-class SceneNode : public sf::Transformable, public sf::Drawable
+class SceneNode : public sf::Transformable
+				, public sf::Drawable
 {
 public:
 	typedef std::unique_ptr<SceneNode> Ptr;
 
-	SceneNode();
+	SceneNode(Category::Type category = Category::None);
 
 	// Non copyable
 	SceneNode(const SceneNode&) = delete;
@@ -31,7 +32,7 @@ public:
 
 	Ptr detachChild(const SceneNode& node);
 
-	void update(sf::Time dt);
+	void update(sf::Time dt, CommandQueue& commands);
 
 	sf::Vector2f getWorldPosition() const;
 
@@ -48,12 +49,13 @@ private:
 
 	void drawChildren(sf::RenderTarget& target, sf::RenderStates states) const;
 
-	virtual void updateCurrent(sf::Time dt);
+	virtual void updateCurrent(sf::Time dt, CommandQueue& commands);
 
-	void updateChildren(sf::Time dt);
+	void updateChildren(sf::Time dt, CommandQueue& commands);
 
 	std::vector<Ptr> mChildren;
 	SceneNode* mParent;
+	Category::Type mDefaultCategory;
 };
 
 #endif

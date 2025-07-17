@@ -35,7 +35,7 @@ void World::update(sf::Time dt)
 
 	spawnEnemies();
 
-	mSceneGraph.update(dt);
+	mSceneGraph.update(dt, mCommandQueue);
 	adaptPlayerPosition();
 }
 
@@ -56,13 +56,18 @@ void World::loadTextures()
 	mTextures.load(Textures::ID::Raptor, "Media/Textures/Raptor.png");
 	mTextures.load(Textures::ID::Avenger, "Media/Textures/Avenger.png");
 	mTextures.load(Textures::ID::Desert, "Media/Textures/Desert.png");
+
+	mTextures.load(Textures::ID::Bullet, "Media/Textures/Bullet.png");
+	mTextures.load(Textures::ID::Missile, "Media/Textures/Missile.png");
 }
 
 void World::buildScene() 
 {
 	for (size_t i = 0; i < LayerCount; ++i)
 	{
-		SceneNode::Ptr layer(new SceneNode());
+		Category::Type category = (i == Air) ? Category::SceneAirLayer : Category::None;
+
+		SceneNode::Ptr layer(new SceneNode(category));
 		mSceneLayers[i] = layer.get();
 
 		mSceneGraph.attachChild(std::move(layer));

@@ -22,7 +22,7 @@ public:
 	virtual bool isDestroyed() const;
 
 protected:
-	virtual void updateCurrent(sf::Time dt);
+	virtual void updateCurrent(sf::Time dt, CommandQueue&);
 
 private:
 	sf::Vector2f mVelocity;

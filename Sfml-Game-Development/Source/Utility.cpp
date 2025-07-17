@@ -1,4 +1,5 @@
 #include "../Header/Utility.hpp"
+#include <cmath>
 
 
 std::string toString(sf::Keyboard::Key key)
@@ -130,4 +131,15 @@ float toDegree(float radian)
 float toRadian(float degree)
 {
 	return 3.141592653589793238462643383f / 180.f * degree;
+}
+
+float length(sf::Vector2f vector)
+{
+	return sqrt(vector.x * vector.x + vector.y * vector.y);
+}
+
+sf::Vector2f unitVector(sf::Vector2f vector)
+{
+	assert(vector != sf::Vector2f(0.f, 0.f));
+	return vector / length(vector);
 }

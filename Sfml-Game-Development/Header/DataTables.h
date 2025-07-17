@@ -2,9 +2,9 @@
 #define DATA_TABLES_H
 
 #include "ResourceIdentifiers.h"
-#include "Aircraft.h"
 
 #include <vector>
+
 
 struct Direction
 {
@@ -26,7 +26,14 @@ struct AircraftData
 	std::vector<Direction> directions;
 };
 
-std::vector<AircraftData> initializeAircraftData();
+struct ProjectileData
+{
+	int damage;
+	float speed;
+	Textures::ID texture;
+};
 
+std::vector<AircraftData> initializeAircraftData();
+std::vector<ProjectileData> initializeProjectileData();
 
 #endif

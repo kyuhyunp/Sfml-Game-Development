@@ -1,9 +1,11 @@
 #include "../Header/SceneNode.h"
 
-SceneNode::SceneNode() 
+SceneNode::SceneNode(Category::Type category) 
 	: mChildren()
 	, mParent(nullptr) 
-{}
+	, mDefaultCategory(category)
+{
+}
 
 void SceneNode::attachChild(Ptr child) 
 {
@@ -23,10 +25,10 @@ SceneNode::Ptr SceneNode::detachChild(const SceneNode& node)
 	return result;
 }
 
-void SceneNode::update(sf::Time dt)
+void SceneNode::update(sf::Time dt, CommandQueue& commands)
 {
-	updateCurrent(dt);
-	updateChildren(dt);
+	updateCurrent(dt, commands);
+	updateChildren(dt, commands);
 }
 
 sf::Transform SceneNode::getWorldTransform() const 
@@ -40,7 +42,8 @@ sf::Transform SceneNode::getWorldTransform() const
 	return transform;
 }
 
-sf::Vector2f SceneNode::getWorldPosition() const {
+sf::Vector2f SceneNode::getWorldPosition() const 
+{
 	return getWorldTransform() * sf::Vector2f();
 }
 
@@ -64,19 +67,21 @@ void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) 
 	}
 }
 
-void SceneNode::updateCurrent(sf::Time dt)
+void SceneNode::updateCurrent(sf::Time, CommandQueue&)
 {
 }
 
-void SceneNode::updateChildren(sf::Time dt)
+void SceneNode::updateChildren(sf::Time dt, CommandQueue& commands)
 {
 	for (Ptr& child : mChildren) {
-		child->update(dt);
+		child->update(dt, commands);
 	}
 }
 
-void SceneNode::onCommand(const Command& command, sf::Time dt) {
-	if (command.category & getCategory()) 
+void SceneNode::onCommand(const Command& command, sf::Time dt) 
+{
+	unsigned int category = getCategory();
+	if (command.category & category) 
 	{
 		command.action(*this, dt);
 	}
@@ -87,8 +92,9 @@ void SceneNode::onCommand(const Command& command, sf::Time dt) {
 	}
 }
 
-unsigned int SceneNode::getCategory() const {
-	return Category::Scene;
+unsigned int SceneNode::getCategory() const 
+{
+	return mDefaultCategory;
 }
 
 
