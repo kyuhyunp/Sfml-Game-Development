@@ -19,6 +19,7 @@ struct Command
 template <typename GameObject, typename Function>
 std::function <void(SceneNode&, sf::Time)> derivedAction(Function fn)
 {
+	// [=] to allow the lambda function to access Function fn
 	return [=](SceneNode& node, sf::Time dt)
 		{
 			// Check if cast is safe
@@ -27,7 +28,6 @@ std::function <void(SceneNode&, sf::Time)> derivedAction(Function fn)
 			// Downcast node and invoke function on it
 			fn(static_cast<GameObject&>(node), dt);
 		};
-	
 }
 
 
