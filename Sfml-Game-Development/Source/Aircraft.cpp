@@ -158,8 +158,6 @@ void Aircraft::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		mIsFiring = false;
 	}
 
-
-
 	if (mIsLaunchingMissile)
 	{
 		commands.push(mMissileCommand);
@@ -199,7 +197,7 @@ void Aircraft::createProjectile(SceneNode& node, Projectile::Type type,
 		yOffset * mSprite.getGlobalBounds().size.y);
 	sf::Vector2f velocity(0, projectile->getMaxSpeed());
 
-	float sign = (type == Projectile::AlliedBullet) ? -1.f : +1.f;
+	float sign = isAllied() ? -1.f : +1.f;
 	projectile->setPosition(getWorldPosition() + offset * sign);
 	projectile->setVelocity(velocity * sign);
 	node.attachChild(std::move(projectile));

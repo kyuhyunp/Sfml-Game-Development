@@ -26,6 +26,8 @@ void World::update(sf::Time dt)
 	mWorldView.move({ 0.f, mScrollSpeed * dt.asSeconds()});
 	mPlayerAircraft->setVelocity({ 0.f, 0.f });
 
+	guideMissiles();
+
 	while (!mCommandQueue.isEmpty())
 	{
 		mSceneGraph.onCommand(mCommandQueue.pop(), dt);
@@ -161,6 +163,56 @@ void World::spawnEnemies()
 
 		mEnemySpawnPoints.pop_back();
 	}
+}
+
+void World::guideMissiles()
+{
+	Command enemyCollector;
+	enemyCollector.category = Category::EnemyAircraft;
+	enemyCollector.action = derivedAction<Aircraft>(
+		[this](Aircraft& enemy, sf::Time)
+		{
+			if (!enemy.isDestroyed())
+			{
+				mActiveEnemies.push_back(&enemy);
+			}
+		}
+	);
+
+	Command missileGuider;
+	missileGuider.category = Category::AlliedProjectile;
+	missileGuider.action = derivedAction<Projectile>(
+		[this](Projectile& missile, sf::Time)
+		{
+			if (!missile.isGuided())
+			{
+				return;
+			}
+			
+			float minDistance = std::numeric_limits<float>::max();
+			Aircraft* closestEnemy = nullptr;
+
+			for (Aircraft* enemy : mActiveEnemies)
+			{
+				float enemyDistance = distance(missile, *enemy);
+				if (enemyDistance < minDistance)
+				{
+					closestEnemy = enemy;
+					minDistance = enemyDistance;
+				}
+			}
+
+			if (closestEnemy)
+			{
+				missile.guideTowards(closestEnemy->getWorldPosition());
+			}
+		}
+	);
+
+	mCommandQueue.push(enemyCollector);
+	mCommandQueue.push(missileGuider);
+	
+	mActiveEnemies.clear();	
 }
 
 sf::FloatRect World::getViewBounds() const

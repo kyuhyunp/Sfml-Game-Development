@@ -42,6 +42,7 @@ private:
 	void addEnemies();
 	void addEnemy(Aircraft::Type type, float relX, float relY);
 	void spawnEnemies();
+	void guideMissiles();
 	sf::FloatRect getViewBounds() const;
 	sf::FloatRect getBattlefieldBounds() const;
 
@@ -81,6 +82,7 @@ private:
 	Aircraft* mPlayerAircraft;
 
 	std::vector<SpawnPoint> mEnemySpawnPoints;
+	std::vector<Aircraft*> mActiveEnemies;
 };
 
 #endif

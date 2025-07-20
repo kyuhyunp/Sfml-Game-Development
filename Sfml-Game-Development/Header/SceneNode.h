@@ -58,5 +58,8 @@ private:
 	Category::Type mDefaultCategory;
 };
 
+// Global function used for SceneNodes
+float distance(const SceneNode& lhs, const SceneNode& rhs);
+
 #endif
 
