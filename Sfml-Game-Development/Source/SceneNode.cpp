@@ -1,4 +1,6 @@
 #include "../Header/SceneNode.h"
+#include "../Header/Utility.hpp"
+
 
 SceneNode::SceneNode(Category::Type category) 
 	: mChildren()
@@ -92,9 +94,14 @@ void SceneNode::onCommand(const Command& command, sf::Time dt)
 	}
 }
 
-unsigned int SceneNode::getCategory() const 
+unsigned int SceneNode::getCategory() const
 {
 	return mDefaultCategory;
+}
+
+float distance(const SceneNode& lhs, const SceneNode& rhs)
+{
+	return (lhs.getWorldPosition() - rhs.getWorldPosition()).length();
 }
 
 

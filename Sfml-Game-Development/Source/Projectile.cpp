@@ -21,7 +21,7 @@ Projectile::Projectile(Type type, const TextureHolder& textures)
 void Projectile::guideTowards(sf::Vector2f position)
 {
 	assert(isGuided());
-	mTargetDirection = unitVector(position - getWorldPosition());
+	mTargetDirection = (position - getWorldPosition()).normalized();
 }
 
 bool Projectile::isGuided() const
@@ -35,8 +35,8 @@ void Projectile::updateCurrent(sf::Time dt, CommandQueue& commands)
 	{ // Steering behavior (evasion, interception, group behavior)
 		const float approachRate = 200.f;
 
-		sf::Vector2f newVelocity = unitVector(
-			approachRate * dt.asSeconds() * mTargetDirection + getVelocity());
+		sf::Vector2f newVelocity = (approachRate * dt.asSeconds() * 
+			mTargetDirection + getVelocity()).normalized();
 		
 		newVelocity *= getMaxSpeed();
 		float angle = std::atan2(newVelocity.y, newVelocity.x);
@@ -56,7 +56,7 @@ void Projectile::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) 
 
 unsigned int Projectile::getCategory() const
 {
-	return 0;
+	return mType == EnemyBullet ? Category::EnemyProjectile : Category::AlliedProjectile;
 }
 
 sf::FloatRect Projectile::getBoundingRect() const
