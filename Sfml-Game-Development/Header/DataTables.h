@@ -3,8 +3,11 @@
 
 #include "ResourceIdentifiers.h"
 
+#include <SFML/System/Time.hpp>
+#include <functional>
 #include <vector>
 
+class Aircraft;
 
 struct Direction
 {
@@ -23,6 +26,7 @@ struct AircraftData
 	int hitpoints;
 	float speed;
 	Textures::ID texture;
+	sf::Time fireInterval;
 	std::vector<Direction> directions;
 };
 
@@ -33,7 +37,14 @@ struct ProjectileData
 	Textures::ID texture;
 };
 
+struct PickupData
+{
+	std::function<void(Aircraft&)> action;
+	Textures::ID texture;
+};
+
 std::vector<AircraftData> initializeAircraftData();
 std::vector<ProjectileData> initializeProjectileData();
+std::vector<PickupData> initializePickupData();
 
 #endif

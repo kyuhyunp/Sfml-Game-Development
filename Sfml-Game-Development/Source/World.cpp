@@ -1,4 +1,7 @@
 #include "../Header/World.h"
+#include "../Header/Pickup.h"
+#include "../Header/SceneNode.h"
+
 
 World::World(sf::RenderWindow& window, FontHolder& fonts)
 	: mWindow(window)
@@ -26,6 +29,7 @@ void World::update(sf::Time dt)
 	mWorldView.move({ 0.f, mScrollSpeed * dt.asSeconds()});
 	mPlayerAircraft->setVelocity({ 0.f, 0.f });
 
+	destroyEntitiesOutsideView();
 	guideMissiles();
 
 	while (!mCommandQueue.isEmpty())
@@ -34,6 +38,9 @@ void World::update(sf::Time dt)
 	}
 
 	adaptPlayerVelocity();
+
+	handleCollisions();
+	mSceneGraph.removeWrecks();
 
 	spawnEnemies();
 
@@ -61,6 +68,11 @@ void World::loadTextures()
 
 	mTextures.load(Textures::ID::Bullet, "Media/Textures/Bullet.png");
 	mTextures.load(Textures::ID::Missile, "Media/Textures/Missile.png");
+
+	mTextures.load(Textures::ID::HealthRefill, "Media/Textures/HealthRefill.png");
+	mTextures.load(Textures::ID::MissileRefill, "Media/Textures/MissileRefill.png");
+	mTextures.load(Textures::ID::FireSpread, "Media/Textures/FireSpread.png");
+	mTextures.load(Textures::ID::FireRate, "Media/Textures/FireRate.png");
 }
 
 void World::buildScene() 
@@ -124,6 +136,64 @@ void World::adaptPlayerPosition()
 	mPlayerAircraft->setPosition(position);
 }
 
+// Return whether the pair matches the categories and reorder the colliders
+bool matchesCategories(SceneNode::Pair& colliders,
+	Category::Type type1, Category::Type type2)
+{
+	unsigned int category1 = colliders.first->getCategory();
+	unsigned int category2 = colliders.second->getCategory();
+
+	// There are sub-categories to categories
+	if (type1 & category1 && type2 & category2)
+	{
+		return true;
+	}
+	else if (type1 & category2 && type2 & category1)
+	{
+		std::swap(colliders.first, colliders.second);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void World::handleCollisions()
+{
+	std::set<SceneNode::Pair> collisionPairs;
+	mSceneGraph.checkSceneCollision(mSceneGraph, collisionPairs);
+
+	for (SceneNode::Pair pair : collisionPairs)
+	{
+		if (matchesCategories(pair, Category::PlayerAircraft, Category::EnemyAircraft))
+		{
+			auto& player = static_cast<Aircraft&> (*pair.first);
+			auto& enemy = static_cast<Aircraft&> (*pair.second);
+
+			player.damage(enemy.getHitpoints());
+			enemy.destroy();
+		}
+		else if (matchesCategories(pair, Category::PlayerAircraft, Category::Pickup))
+		{
+			auto& player = static_cast<Aircraft&> (*pair.first);
+			auto& pickup = static_cast<Pickup&> (*pair.second);
+
+			pickup.apply(player);
+			pickup.destroy();
+		}
+		else if (matchesCategories(pair, Category::PlayerAircraft, Category::EnemyProjectile)
+			|| matchesCategories(pair, Category::EnemyAircraft, Category::AlliedProjectile))
+		{
+			auto& aircraft = static_cast<Aircraft&> (*pair.first);
+			auto& projectile = static_cast<Projectile&> (*pair.second);
+
+			aircraft.damage(projectile.getDamage());
+			projectile.destroy();
+		}
+	}
+}
+
 void World::addEnemies()
 {
 	addEnemy(Aircraft::Raptor, 0.f, 500.f);
@@ -163,6 +233,24 @@ void World::spawnEnemies()
 
 		mEnemySpawnPoints.pop_back();
 	}
+}
+
+void World::destroyEntitiesOutsideView()
+{
+	Command command;
+	command.category = Category::Projectile
+		| Category::EnemyAircraft;
+	command.action = derivedAction<Entity>(
+		[this](Entity& e, sf::Time)
+		{
+			if (getBattlefieldBounds().findIntersection(e.getBoundingRect())
+				== std::nullopt)
+			{
+				e.destroy();
+			}
+		});
+
+	mCommandQueue.push(command);
 }
 
 void World::guideMissiles()
@@ -229,3 +317,6 @@ sf::FloatRect World::getBattlefieldBounds() const
 
 	return bounds;
 }
+
+
+

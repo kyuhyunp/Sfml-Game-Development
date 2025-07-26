@@ -83,7 +83,6 @@ void SettingsState::updateLabels()
 
 void SettingsState::addButtonLabel(Player::Action action, float y, const std::string& text, Context context)
 {
-
 	mBindingButtons[action] = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
 	mBindingButtons[action]->setPosition({ 80.f, y });
 	mBindingButtons[action]->setText(text);

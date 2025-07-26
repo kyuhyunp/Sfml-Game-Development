@@ -2,10 +2,9 @@
 #define PLAYER_H
 
 #include "CommandQueue.h"
-#include "Aircraft.h"
 #include <SFML/Window/Event.hpp>
 
-#include <iostream>
+#include <map>
 
 
 class Player

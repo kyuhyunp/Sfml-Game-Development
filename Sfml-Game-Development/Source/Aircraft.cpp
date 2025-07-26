@@ -1,6 +1,10 @@
 #include "../Header/Aircraft.h"
 #include "../Header/DataTables.h"
 #include "../Header/Utility.hpp"
+#include "../Header/ResourceHolder.hpp"
+#include "../Header/Pickup.h"
+
+#include "cmath"
 
 
 namespace
@@ -8,43 +12,25 @@ namespace
 	const std::vector<AircraftData> Table = initializeAircraftData();
 }
 
-Textures::ID toTextureID(Aircraft::Type type)
-{
-	switch (type) 
-	{
-	case Aircraft::Eagle:
-		return Textures::ID::Eagle;
-
-	case Aircraft::Raptor:
-		return Textures::ID::Raptor;
-
-	case Aircraft::Avenger:
-		return Textures::ID::Avenger;
-	}
-
-	return Textures::ID::Eagle;
-}
-
 Aircraft::Aircraft(Type type, const FontHolder& fonts, const TextureHolder& textures)
 	: Entity(Table[type].hitpoints)
 	, mType(type) 
-	, mSprite(textures.get(toTextureID(type)))
+	, mSprite(textures.get(Table[type].texture))
 	, mFireCommand()
 	, mMissileCommand()
 	, mFireCountdown(sf::Time::Zero)
 	, mIsFiring(false)
 	, mIsLaunchingMissile(false)
+	, mIsMarkedForRemoval(false)
 	, mFireRateLevel(1)
 	, mSpreadLevel(1)
+	, mMissileAmmo(2)
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
-	, mHealthDisplay()
+	, mHealthDisplay(nullptr)
+	, mMissileDisplay(nullptr)
 {
 	centerOrigin(mSprite);
-
-	std::unique_ptr<TextNode> healthDisplay(new TextNode(fonts, "HP 100"));
-	mHealthDisplay = healthDisplay.get();
-	attachChild(std::move(healthDisplay));
 
 	mFireCommand.category = Category::SceneAirLayer;
 	mFireCommand.action = [this, &textures](SceneNode& node, sf::Time dt)
@@ -58,6 +44,24 @@ Aircraft::Aircraft(Type type, const FontHolder& fonts, const TextureHolder& text
 		createProjectile(node, Projectile::Missile, 0.f, 0.5f, textures);
 	};
 
+	mDropPickupCommand.category = Category::SceneAirLayer;
+	mDropPickupCommand.action = [this, &textures](SceneNode& node, sf::Time)
+	{
+		createPickup(node, textures);
+	};
+
+	std::unique_ptr<TextNode> healthDisplay(new TextNode(fonts, "HP 100"));
+	mHealthDisplay = healthDisplay.get();
+	attachChild(std::move(healthDisplay));
+
+	if (getCategory() == Category::PlayerAircraft)
+	{
+		std::unique_ptr<TextNode> missileDisplay(new TextNode(fonts, ""));
+		missileDisplay->setPosition({ 0.f, 70.f });
+		mMissileDisplay = missileDisplay.get();
+		attachChild(std::move(missileDisplay));
+	}
+
 	updateTexts();
 }
 
@@ -68,6 +72,14 @@ void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 
 void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
+	if (isDestroyed())
+	{
+		checkPickupDrop(commands);
+
+		mIsMarkedForRemoval = true;
+		return;
+	}
+
 	checkProjectileLaunch(dt, commands);
 
 	updateMovementPattern(dt);
@@ -87,6 +99,16 @@ unsigned int Aircraft::getCategory() const
 	}
 }
 
+sf::FloatRect Aircraft::getBoundingRect() const
+{
+	return getWorldTransform().transformRect(mSprite.getGlobalBounds());
+}
+
+bool Aircraft::isMarkedForRemoval() const
+{
+	return mIsMarkedForRemoval;
+}
+
 bool Aircraft::isAllied() const
 {
 	return mType == Eagle;
@@ -97,14 +119,42 @@ float Aircraft::getMaxSpeed() const
 	return Table[mType].speed;
 }
 
+void Aircraft::increaseFireRate()
+{
+	if (mFireRateLevel < 10)
+	{
+		++mFireRateLevel;
+	}
+}
+
+void Aircraft::increaseSpread()
+{
+	if (mSpreadLevel < 3)
+	{
+		++mSpreadLevel;
+	}
+}
+
+void Aircraft::collectMissiles(unsigned int count)
+{
+	mMissileAmmo += count;
+}
+
 void Aircraft::fire()
 {
-	mIsFiring = true;
+	if (Table[mType].fireInterval != sf::Time::Zero)
+	{
+		mIsFiring = true;
+	}
 }
 
 void Aircraft::launchMissile()
 {
-	mIsLaunchingMissile = true;
+	if (mMissileAmmo > 0)
+	{
+		mIsLaunchingMissile = true;
+		--mMissileAmmo;
+	}
 }
 
 void Aircraft::updateMovementPattern(sf::Time dt)
@@ -129,6 +179,14 @@ void Aircraft::updateMovementPattern(sf::Time dt)
 	}
 }
 
+void Aircraft::checkPickupDrop(CommandQueue& commands)
+{
+	if (!isAllied() && rand() % 3 == 0)
+	{
+		commands.push(mDropPickupCommand);
+	}
+}
+
 void Aircraft::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
 	if (!isAllied())
@@ -141,7 +199,7 @@ void Aircraft::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		commands.push(mFireCommand);
 
 		assert(mFireRateLevel > 0);
-		mFireCountdown += sf::seconds(1.f / (mFireRateLevel + 1));
+		mFireCountdown += Table[mType].fireInterval / (mFireRateLevel + 1.f);
 		mIsFiring = false;
 	}
 	else if (mFireCountdown > sf::Time::Zero)
@@ -203,6 +261,16 @@ void Aircraft::createProjectile(SceneNode& node, Projectile::Type type,
 	node.attachChild(std::move(projectile));
 }
 
+void Aircraft::createPickup(SceneNode& node, const TextureHolder& textures) const
+{
+	auto type = static_cast<Pickup::Type>(rand() % Pickup::TypeCount);
+
+	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
+	pickup->setPosition(getWorldPosition());
+	pickup->setVelocity({ 0.f, 1.f });
+	node.attachChild(std::move(pickup));
+}
+
 void Aircraft::updateTexts()
 {
 	mHealthDisplay->setString(toString(getHitpoints()) + " HP");
@@ -210,4 +278,16 @@ void Aircraft::updateTexts()
 
 	// Set rotation back to original
 	mHealthDisplay->setRotation(-getRotation()); 
+
+	if (mMissileDisplay)
+	{
+		if (mMissileAmmo == 0)
+		{
+			mMissileDisplay->setString("");
+		}
+		else
+		{
+			mMissileDisplay->setString("M: " + toString(mMissileAmmo));
+		}
+	}
 }
