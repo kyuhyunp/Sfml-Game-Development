@@ -1,4 +1,6 @@
 #include "../Header/Player.h"
+#include "../Header/Aircraft.h"
+
 
 struct AircraftMover
 {

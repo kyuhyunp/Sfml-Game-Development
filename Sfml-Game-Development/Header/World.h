@@ -1,12 +1,12 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "ResourceHolder.hpp"
 #include "ResourceIdentifiers.h"
-#include "Aircraft.h"
+#include "ResourceHolder.hpp"
 #include "SpriteNode.h"
-#include "SceneNode.h"
 #include "CommandQueue.h"
+#include "Aircraft.h"
+#include "Category.h"
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -18,6 +18,7 @@ namespace sf
 {
 	class RenderWindow;
 }
+
 
 class World
 {
@@ -37,14 +38,17 @@ private:
 	void loadTextures();
 	void adaptPlayerVelocity();
 	void adaptPlayerPosition();
+	void handleCollisions();
 
 	void buildScene();
 	void addEnemies();
 	void addEnemy(Aircraft::Type type, float relX, float relY);
 	void spawnEnemies();
+	void destroyEntitiesOutsideView();
 	void guideMissiles();
 	sf::FloatRect getViewBounds() const;
 	sf::FloatRect getBattlefieldBounds() const;
+
 
 	enum Layer 
 	{

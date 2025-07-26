@@ -1,6 +1,8 @@
 #include "../Header/SceneNode.h"
 #include "../Header/Utility.hpp"
 
+#include "SFML/Graphics/RectangleShape.hpp"
+
 
 SceneNode::SceneNode(Category::Type category) 
 	: mChildren()
@@ -55,6 +57,8 @@ void SceneNode::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 	drawCurrent(target, states);
 	drawChildren(target, states);
+
+	//drawBoundingRect(target, states);
 }
 
 void SceneNode::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const 
@@ -67,6 +71,18 @@ void SceneNode::drawChildren(sf::RenderTarget& target, sf::RenderStates states) 
 	{
 		child->draw(target, states);
 	}
+}
+void SceneNode::drawBoundingRect(sf::RenderTarget& target, sf::RenderStates states) const
+{
+	sf::FloatRect boundary = getBoundingRect();
+
+	sf::RectangleShape rectangle(boundary.size);
+	rectangle.setPosition(boundary.position);
+	rectangle.setFillColor(sf::Color::Transparent);
+	rectangle.setOutlineColor(sf::Color::Green);
+	rectangle.setOutlineThickness(1.f);
+
+	target.draw(rectangle);
 }
 
 void SceneNode::updateCurrent(sf::Time, CommandQueue&)
@@ -99,9 +115,78 @@ unsigned int SceneNode::getCategory() const
 	return mDefaultCategory;
 }
 
+/*
+* Call checkNodeCollision for SceneGraph and its children
+*/
+void SceneNode::checkSceneCollision(SceneNode& sceneGraph, std::set<Pair>& collisionPairs)
+{
+	checkNodeCollision(sceneGraph, collisionPairs);
+
+	for (Ptr& child : sceneGraph.mChildren)
+	{
+		checkSceneCollision(*child, collisionPairs);
+	}
+}
+
+/*
+* Compare node with this SceneNode and all its children
+*/
+void SceneNode::checkNodeCollision(SceneNode& node, std::set<Pair>& collisionPairs)
+{
+	if (this != &node &&
+		!isDestroyed() && !node.isDestroyed() 
+		&& collision(*this, node))
+	{
+		collisionPairs.insert(std::minmax(this, &node));
+	}
+
+	for (Ptr& child : mChildren)
+	{ // Have its children call checkNodeCollision and check with node
+		child->checkNodeCollision(node, collisionPairs);
+	}
+}
+
+void SceneNode::removeWrecks()
+{
+	// mem_fn used as it is applied to each one of the iterators 
+	// from mChildren.begin() to mChildren.end()
+	auto wreckfieldBegin = std::remove_if(mChildren.begin(), mChildren.end(),
+		std::mem_fn(&SceneNode::isMarkedForRemoval));
+	mChildren.erase(wreckfieldBegin, mChildren.end());
+	std::for_each(mChildren.begin(), mChildren.end(),
+		std::mem_fn(&SceneNode::removeWrecks));
+}
+
+sf::FloatRect SceneNode::getBoundingRect() const
+{
+	return sf::FloatRect();
+}
+
+bool SceneNode::isMarkedForRemoval() const
+{
+	return isDestroyed();
+}
+
+bool SceneNode::isDestroyed() const
+{
+	return false;
+}
+
 float distance(const SceneNode& lhs, const SceneNode& rhs)
 {
 	return (lhs.getWorldPosition() - rhs.getWorldPosition()).length();
 }
+
+
+bool collision(const SceneNode& lhs, const SceneNode& rhs)
+{
+	const sf::FloatRect& lhsRect = lhs.getBoundingRect();
+	const sf::FloatRect& rhsRect = rhs.getBoundingRect();
+	
+	return lhsRect.findIntersection(rhsRect) != std::nullopt;
+}
+
+
+
 
 

@@ -22,6 +22,7 @@ public:
 	virtual bool isDestroyed() const;
 
 protected:
+	void setCategory(Category::Type category);
 	virtual void updateCurrent(sf::Time dt, CommandQueue&);
 
 private:
