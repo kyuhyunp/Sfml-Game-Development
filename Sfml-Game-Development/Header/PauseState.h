@@ -2,8 +2,6 @@
 #define PAUSE_STATE_H
 
 #include "State.h"
-#include "Utility.hpp"
-#include "ResourceHolder.hpp"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>

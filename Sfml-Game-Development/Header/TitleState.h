@@ -1,8 +1,6 @@
 #ifndef TITLE_STATE_H
 #define TITLE_STATE_H
 
-#include "Utility.hpp"
-#include "ResourceHolder.hpp"
 #include "State.h"
 
 #include <SFML/Graphics/Sprite.hpp>

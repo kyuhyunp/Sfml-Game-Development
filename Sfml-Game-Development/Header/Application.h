@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "StateStack.h"
 #include "Utility.hpp"
+
 #include "State.h"
 #include "StateIdentifiers.h"
 #include "TitleState.h"
@@ -13,6 +14,7 @@
 #include "MenuState.h"
 #include "PauseState.h"
 #include "SettingsState.h"
+#include "GameOverState.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

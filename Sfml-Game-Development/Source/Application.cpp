@@ -1,10 +1,12 @@
 #include "../Header/Application.h"
+#include "../Header/Utility.hpp"
+#include "../Header/ResourceHolder.hpp"
 
 
 const sf::Time Application::TimePerFrame = sf::seconds(1.f/60.f);
 
 Application::Application(FontHolder& fonts)
-	: mWindow(sf::VideoMode({ 640, 480 }), "States", sf::Style::Close)
+	: mWindow(sf::VideoMode({ 1024, 768 }), "States", sf::Style::Close)
 	, mTextures()
 	, mFonts(fonts)
 	, mPlayer()
@@ -108,4 +110,5 @@ void Application::registerStates()
 	mStateStack.registerState<GameState>(States::Game);
 	mStateStack.registerState<PauseState>(States::Pause);
 	mStateStack.registerState<SettingsState>(States::Settings);
+	mStateStack.registerState<GameOverState>(States::GameOver);
 }

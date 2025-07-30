@@ -1,4 +1,7 @@
 #include "../Header/TitleState.h"
+#include "../Header/Utility.hpp"
+#include "../Header/ResourceHolder.hpp"
+
 
 TitleState::TitleState(StateStack& stack, Context context)
 	: State(stack, context)
