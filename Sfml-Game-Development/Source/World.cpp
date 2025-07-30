@@ -59,6 +59,18 @@ CommandQueue& World::getCommandQueue()
 	return mCommandQueue;
 }
 
+bool World::hasAlivePlayer() const
+{
+	assert(mPlayerAircraft);
+	return !mPlayerAircraft->isMarkedForRemoval();
+}
+
+bool World::hasPlayerReachedEnd() const
+{
+	assert(mPlayerAircraft);
+	return !mWorldBounds.contains(mPlayerAircraft->getPosition());
+}
+
 void World::loadTextures() 
 {
 	mTextures.load(Textures::ID::Eagle, "Media/Textures/Eagle.png");
@@ -238,8 +250,7 @@ void World::spawnEnemies()
 void World::destroyEntitiesOutsideView()
 {
 	Command command;
-	command.category = Category::Projectile
-		| Category::EnemyAircraft;
+	command.category = Category::Projectile | Category::EnemyAircraft;
 	command.action = derivedAction<Entity>(
 		[this](Entity& e, sf::Time)
 		{

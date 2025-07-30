@@ -34,6 +34,9 @@ public:
 
 	CommandQueue& getCommandQueue();
 
+	bool hasAlivePlayer() const;
+	bool hasPlayerReachedEnd() const;
+
 private:
 	void loadTextures();
 	void adaptPlayerVelocity();

@@ -1,5 +1,8 @@
 #include "../Header/PauseState.h"
 
+#include "../Header/Utility.hpp"
+#include "../Header/ResourceHolder.hpp"
+
 // Possibly use a RectangleShape to block other views
 PauseState::PauseState(StateStack& stack, Context context)
 	: State(stack, context)

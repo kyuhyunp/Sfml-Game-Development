@@ -1,6 +1,6 @@
 #include "../Header/SettingsState.h"
-#include "../Header/ResourceHolder.hpp"
 #include "../Header/Utility.hpp"
+#include "../Header/ResourceHolder.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
@@ -10,15 +10,17 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	, mBackgroundSprite(context.textures->get(Textures::ID::TitleScreen))
 	, mGUIContainer()
 {
-	addButtonLabel(Player::MoveLeft, 150.f, "Move Left", context);
-	addButtonLabel(Player::MoveRight, 200.f, "Move Right", context);
-	addButtonLabel(Player::MoveUp, 250.f, "Move Up", context);
-	addButtonLabel(Player::MoveDown, 300.f, "Move Down", context);
+	addButtonLabel(Player::MoveLeft, 300.f, "Move Left", context);
+	addButtonLabel(Player::MoveRight, 350.f, "Move Right", context);
+	addButtonLabel(Player::MoveUp, 400.f, "Move Up", context);
+	addButtonLabel(Player::MoveDown, 450.f, "Move Down", context);
+	addButtonLabel(Player::Fire, 500.f, "Fire", context);
+	addButtonLabel(Player::LaunchMissile, 550.f, "Missile", context);
 
 	updateLabels();
 
 	auto backButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	backButton->setPosition({ 80.f, 375.f });
+	backButton->setPosition({ 80.f, 620.f });
 	backButton->setText("Back");
 	backButton->setCallback(std::bind(&SettingsState::requestStackPop, this));
 
@@ -51,7 +53,8 @@ bool SettingsState::handleEvent(const sf::Event& event)
 			isKeyBinding = true;
 			if (const auto* keyReleased = event.getIf<sf::Event::KeyReleased>())
 			{
-				getContext().player->assignKey(static_cast<Player::Action>(action), keyReleased->code);
+				getContext().player->assignKey(
+					static_cast<Player::Action>(action), keyReleased->code);
 				mBindingButtons[action]->deactivate();
 			}
 			break;
