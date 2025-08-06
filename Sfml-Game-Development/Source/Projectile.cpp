@@ -2,6 +2,9 @@
 #include "../Header/ResourceHolder.hpp"
 #include "../Header/DataTables.h"
 #include "../Header/Utility.hpp"
+#include "../Header/EmitterNode.h"
+
+#include <memory>
 
 
 namespace
@@ -12,10 +15,21 @@ namespace
 Projectile::Projectile(Type type, const TextureHolder& textures)
 	: Entity(1)
 	, mType(type)
-	, mSprite(textures.get(Table[type].texture))
+	, mSprite(textures.get(Table[type].texture), Table[type].textureRect)
 	, mTargetDirection()
 {
 	centerOrigin(mSprite);
+
+	if (isGuided())
+	{
+		std::unique_ptr<EmitterNode> smoke(new EmitterNode(Particle::Type::Smoke));
+		smoke->setPosition({ 0.f, getBoundingRect().size.y / 2.f });
+		attachChild(std::move(smoke));
+
+		std::unique_ptr<EmitterNode> propellant(new EmitterNode(Particle::Type::Propellant));
+		propellant->setPosition({ 0.f, getBoundingRect().size.y / 2.f }); 
+		attachChild(std::move(propellant));
+	}
 }
 
 void Projectile::guideTowards(sf::Vector2f position)

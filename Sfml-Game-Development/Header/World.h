@@ -56,7 +56,8 @@ private:
 	enum Layer 
 	{
 		Background,
-		Air,
+		LowerAir,
+		UpperAir,
 		LayerCount
 	};
 

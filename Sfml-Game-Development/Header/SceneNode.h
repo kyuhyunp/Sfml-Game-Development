@@ -2,8 +2,6 @@
 #define SCENENODE_H
 
 #include "Category.h"
-#include "Command.h"
-#include "CommandQueue.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/Transformable.hpp>
@@ -16,6 +14,9 @@
 #include <vector>
 #include <cassert>
 #include <set>
+
+struct Command;
+class CommandQueue;
 
 class SceneNode : public sf::Transformable
 				, public sf::Drawable

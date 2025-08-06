@@ -15,7 +15,7 @@ namespace
 Aircraft::Aircraft(Type type, const FontHolder& fonts, const TextureHolder& textures)
 	: Entity(Table[type].hitpoints)
 	, mType(type) 
-	, mSprite(textures.get(Table[type].texture))
+	, mSprite(textures.get(Table[type].texture), Table[type].textureRect)
 	, mFireCommand()
 	, mMissileCommand()
 	, mFireCountdown(sf::Time::Zero)

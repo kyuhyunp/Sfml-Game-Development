@@ -18,9 +18,7 @@ Application::Application(FontHolder& fonts)
 	mWindow.setKeyRepeatEnabled(false);
 
 	mTextures.load(Textures::ID::TitleScreen, "Media/Textures/TitleScreen.png");
-	mTextures.load(Textures::ID::ButtonNormal, "Media/Textures/ButtonNormal.png");
-	mTextures.load(Textures::ID::ButtonSelected, "Media/Textures/ButtonSelected.png");
-	mTextures.load(Textures::ID::ButtonPressed, "Media/Textures/ButtonPressed.png");
+	mTextures.load(Textures::ID::Buttons, "Media/Textures/Buttons.png");
 
 	mStatisticsText.setPosition({ 5.f, 5.f });
 	mStatisticsText.setCharacterSize(10u);
