@@ -1,6 +1,8 @@
 #include "../Header/World.h"
 #include "../Header/Pickup.h"
 #include "../Header/SceneNode.h"
+#include "../Header/Particle.h"
+#include "../Header/ParticleNode.h"
 
 
 World::World(sf::RenderWindow& window, FontHolder& fonts)
@@ -61,37 +63,30 @@ CommandQueue& World::getCommandQueue()
 
 bool World::hasAlivePlayer() const
 {
-	assert(mPlayerAircraft);
 	return !mPlayerAircraft->isMarkedForRemoval();
 }
 
 bool World::hasPlayerReachedEnd() const
 {
-	assert(mPlayerAircraft);
 	return !mWorldBounds.contains(mPlayerAircraft->getPosition());
 }
 
 void World::loadTextures() 
 {
-	mTextures.load(Textures::ID::Eagle, "Media/Textures/Eagle.png");
-	mTextures.load(Textures::ID::Raptor, "Media/Textures/Raptor.png");
-	mTextures.load(Textures::ID::Avenger, "Media/Textures/Avenger.png");
-	mTextures.load(Textures::ID::Desert, "Media/Textures/Desert.png");
+	mTextures.load(Textures::ID::Entities, "Media/Textures/Entities.png");
 
-	mTextures.load(Textures::ID::Bullet, "Media/Textures/Bullet.png");
-	mTextures.load(Textures::ID::Missile, "Media/Textures/Missile.png");
+	mTextures.load(Textures::ID::Jungle, "Media/Textures/Jungle.png");
+	
+	mTextures.load(Textures::ID::Particle, "Media/Textures/Particle.png");
 
-	mTextures.load(Textures::ID::HealthRefill, "Media/Textures/HealthRefill.png");
-	mTextures.load(Textures::ID::MissileRefill, "Media/Textures/MissileRefill.png");
-	mTextures.load(Textures::ID::FireSpread, "Media/Textures/FireSpread.png");
-	mTextures.load(Textures::ID::FireRate, "Media/Textures/FireRate.png");
 }
 
 void World::buildScene() 
 {
 	for (size_t i = 0; i < LayerCount; ++i)
 	{
-		Category::Type category = (i == Air) ? Category::SceneAirLayer : Category::None;
+		Category::Type category = i == LowerAir ?
+			Category::SceneAirLayer : Category::None;
 
 		SceneNode::Ptr layer(new SceneNode(category));
 		mSceneLayers[i] = layer.get();
@@ -99,19 +94,29 @@ void World::buildScene()
 		mSceneGraph.attachChild(std::move(layer));
 	}
 
-	sf::Texture& texture = mTextures.get(Textures::ID::Desert);
-	texture.setRepeated(true);
+	sf::Texture& jungleTexture = mTextures.get(Textures::ID::Jungle);
+	jungleTexture.setRepeated(true);
 
-	std::unique_ptr<SpriteNode> backgroundSprite(new SpriteNode(texture, 
+	std::unique_ptr<SpriteNode> jungleSprite(new SpriteNode(jungleTexture, 
 		static_cast<sf::IntRect>(mWorldBounds)));
-	backgroundSprite->setPosition(mWorldBounds.position);
+	jungleSprite->setPosition(mWorldBounds.position);
 	mSceneLayers[Background]
-		->attachChild(std::move(backgroundSprite));
+		->attachChild(std::move(jungleSprite));
+
+	std::unique_ptr<ParticleNode>smokeNode(
+		new ParticleNode(Particle::Type::Smoke, mTextures));
+	mSceneLayers[LowerAir]->attachChild(std::move(smokeNode));
+
+	std::unique_ptr<ParticleNode>propellantNode(
+		new ParticleNode(Particle::Type::Propellant, mTextures));
+	mSceneLayers[LowerAir]->attachChild(std::move(propellantNode));
 
 	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mFonts, mTextures));
 	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
-	mSceneLayers[Air]->attachChild(std::move(player));
+	mSceneLayers[UpperAir]->attachChild(std::move(player));
+
+
 
 	addEnemies();
 }
@@ -241,7 +246,7 @@ void World::spawnEnemies()
 		enemy->setPosition({ spawn.x, spawn.y });
 		enemy->setRotation(sf::degrees(180.f));
 
-		mSceneLayers[Air]->attachChild(std::move(enemy));
+		mSceneLayers[UpperAir]->attachChild(std::move(enemy));
 
 		mEnemySpawnPoints.pop_back();
 	}

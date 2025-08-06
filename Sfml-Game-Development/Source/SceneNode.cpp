@@ -1,4 +1,5 @@
 #include "../Header/SceneNode.h"
+#include "../Header/Command.h"
 #include "../Header/Utility.hpp"
 
 #include "SFML/Graphics/RectangleShape.hpp"

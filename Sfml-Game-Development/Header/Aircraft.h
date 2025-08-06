@@ -5,6 +5,7 @@
 #include "ResourceIdentifiers.h"
 #include "TextNode.h"
 #include "Projectile.h"
+#include "Command.h"
 
 
 class Aircraft : public Entity
