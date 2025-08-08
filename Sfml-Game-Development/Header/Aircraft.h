@@ -6,6 +6,7 @@
 #include "TextNode.h"
 #include "Projectile.h"
 #include "Command.h"
+#include "Animation.h"
 
 
 class Aircraft : public Entity
@@ -23,6 +24,7 @@ public:
 
 	virtual unsigned int getCategory() const;
 	virtual sf::FloatRect getBoundingRect() const;
+	virtual void remove();
 	virtual bool isMarkedForRemoval() const;
 	bool isAllied() const;
 	float getMaxSpeed() const;
@@ -49,16 +51,19 @@ private:
 	void createPickup(SceneNode& node, const TextureHolder& textures) const;
 
 	void updateTexts();
+	void updateRollAnimation();
 
 	Type mType;
 	sf::Sprite mSprite;
+	Animation mExplosion;
 	Command mFireCommand;
 	Command mMissileCommand;
 	Command mDropPickupCommand;
 	sf::Time mFireCountdown;
 	bool mIsFiring;
 	bool mIsLaunchingMissile;
-	bool mIsMarkedForRemoval;
+	bool mShowExplosion;
+	bool mSpawnedPickup;
 
 	int mFireRateLevel;
 	int mSpreadLevel;
@@ -68,6 +73,8 @@ private:
 	size_t mDirectionIndex;
 	TextNode* mHealthDisplay;
 	TextNode* mMissileDisplay;
+
+	
 };
 
 #endif

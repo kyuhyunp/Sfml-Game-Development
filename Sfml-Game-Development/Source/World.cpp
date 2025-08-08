@@ -74,10 +74,9 @@ bool World::hasPlayerReachedEnd() const
 void World::loadTextures() 
 {
 	mTextures.load(Textures::ID::Entities, "Media/Textures/Entities.png");
-
 	mTextures.load(Textures::ID::Jungle, "Media/Textures/Jungle.png");
-	
 	mTextures.load(Textures::ID::Particle, "Media/Textures/Particle.png");
+	mTextures.load(Textures::ID::Explosion, "Media/Textures/Explosion.png");
 
 }
 
@@ -115,8 +114,6 @@ void World::buildScene()
 	mPlayerAircraft = player.get();
 	mPlayerAircraft->setPosition(mSpawnPosition);
 	mSceneLayers[UpperAir]->attachChild(std::move(player));
-
-
 
 	addEnemies();
 }
@@ -262,7 +259,7 @@ void World::destroyEntitiesOutsideView()
 			if (getBattlefieldBounds().findIntersection(e.getBoundingRect())
 				== std::nullopt)
 			{
-				e.destroy();
+				e.remove();
 			}
 		});
 
