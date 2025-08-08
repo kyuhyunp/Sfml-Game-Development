@@ -1,4 +1,6 @@
 #include "../Header/Utility.hpp"
+#include "../Header/Animation.h"
+
 #include <cmath>
 
 
@@ -121,6 +123,12 @@ void centerOrigin(sf::Text& text)
 {
 	sf::Vector2f center = text.getLocalBounds().getCenter();
 	text.setOrigin({ std::floor(center.x), std::floor(center.y) });
+}
+
+void centerOrigin(Animation& animation)
+{
+	sf::Vector2f center = animation.getLocalBounds().getCenter();
+	animation.setOrigin({ std::floor(center.x), std::floor(center.y) });
 }
 
 float toDegree(float radian)

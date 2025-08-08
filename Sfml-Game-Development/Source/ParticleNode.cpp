@@ -9,7 +9,7 @@ namespace
 {
 	const std::vector<ParticleData> Table = initializeParticleData();
 }
-// four points using size, half of the texture
+
 
 ParticleNode::ParticleNode(Particle::Type type, const TextureHolder& textures)
 	: SceneNode()
