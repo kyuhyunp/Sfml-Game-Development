@@ -21,26 +21,23 @@ PauseState::PauseState(StateStack& stack, Context context)
 	sf::Vector2f pausePosition = { 0.5f * viewSize.x,  0.4f * viewSize.y };
 	mPauseText.setPosition(pausePosition);
 
-	auto mReturnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	mReturnButton->setPosition({ pausePosition.x - 100, pausePosition.y + 75.f });
-	mReturnButton->setText("Return");
-	mReturnButton->setCallback([this]() {
+	auto returnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	returnButton->setPosition({ pausePosition.x - 100, pausePosition.y + 75.f });
+	returnButton->setText("Return");
+	returnButton->setCallback([this]() {
 		requestStackPop();
 	});
 
-	auto mMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
-	mMenuButton->setPosition({ pausePosition.x - 100, pausePosition.y + 125.f });
-	mMenuButton->setText("Back to menu");
-	mMenuButton->setCallback([this]() {
+	auto backToMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	backToMenuButton->setPosition({ pausePosition.x - 100, pausePosition.y + 125.f });
+	backToMenuButton->setText("Back to menu");
+	backToMenuButton->setCallback([this]() {
 		requestStateClear();
 		requestStackPush(States::Menu);
 	});
 
-	mGUIContainer.pack(mReturnButton);
-	mGUIContainer.pack(mMenuButton);
-	/*mInstructionText.setString("(Press Backspace to return to the main menu)");
-	centerOrigin(mInstructionText);
-	mInstructionText.setPosition({ 0.5f * viewSize.x,  0.6f * viewSize.y });*/
+	mGUIContainer.pack(returnButton);
+	mGUIContainer.pack(backToMenuButton);
 }
 
 void PauseState::draw()
