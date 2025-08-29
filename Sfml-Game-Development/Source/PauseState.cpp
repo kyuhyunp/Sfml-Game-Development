@@ -2,24 +2,42 @@
 
 #include "../Header/Utility.hpp"
 #include "../Header/ResourceHolder.hpp"
+#include "../Header/Button.h"
 
-// Possibly use a RectangleShape to block other views
+#include <memory>
+
+
 PauseState::PauseState(StateStack& stack, Context context)
 	: State(stack, context)
-	, mBackgroundSprite(context.textures->get(Textures::ID::TitleScreen))
 	, mPauseText(context.fonts->get(Fonts::ID::Sansation))
-	, mInstructionText(context.fonts->get(Fonts::ID::Sansation))
+	, mGUIContainer()
 { 
 	sf::Vector2f viewSize = context.window->getView().getSize();
 
 	mPauseText.setString("Game Paused");
 	mPauseText.setCharacterSize(70);
 	centerOrigin(mPauseText);
-	mPauseText.setPosition({ 0.5f * viewSize.x,  0.4f * viewSize.y });
 
-	mInstructionText.setString("(Press Backspace to return to the main menu)");
-	centerOrigin(mInstructionText);
-	mInstructionText.setPosition({ 0.5f * viewSize.x,  0.6f * viewSize.y });
+	sf::Vector2f pausePosition = { 0.5f * viewSize.x,  0.4f * viewSize.y };
+	mPauseText.setPosition(pausePosition);
+
+	auto returnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	returnButton->setPosition({ pausePosition.x - 100, pausePosition.y + 75.f });
+	returnButton->setText("Return");
+	returnButton->setCallback([this]() {
+		requestStackPop();
+	});
+
+	auto backToMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	backToMenuButton->setPosition({ pausePosition.x - 100, pausePosition.y + 125.f });
+	backToMenuButton->setText("Back to menu");
+	backToMenuButton->setCallback([this]() {
+		requestStateClear();
+		requestStackPush(States::Menu);
+	});
+
+	mGUIContainer.pack(returnButton);
+	mGUIContainer.pack(backToMenuButton);
 }
 
 void PauseState::draw()
@@ -31,9 +49,9 @@ void PauseState::draw()
 	sf::RectangleShape backgroundShape(window.getView().getSize());
 	backgroundShape.setFillColor(sf::Color(0, 0, 0, 150));
 
-	window.draw(mBackgroundSprite);
+	window.draw(backgroundShape);
 	window.draw(mPauseText);
-	window.draw(mInstructionText);
+	window.draw(mGUIContainer);
 }
 
 bool PauseState::update(sf::Time dt)
@@ -43,19 +61,7 @@ bool PauseState::update(sf::Time dt)
 
 bool PauseState::handleEvent(const sf::Event& event)
 {
-	if (const auto* keyPressed = event.getIf<sf::Event::KeyPressed>())
-	{
-		if (keyPressed->code == sf::Keyboard::Key::Escape)
-		{ // Play
-			requestStackPop();
-		}
-		else if (keyPressed->code == sf::Keyboard::Key::Backspace)
-		{ // Menu
-			requestStateClear();
-			requestStackPush(States::Menu);
-		}
-	}
+	mGUIContainer.handleEvent(event);
 
-	// Don't let players handle GameState event
 	return false;
 }

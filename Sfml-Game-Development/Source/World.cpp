@@ -1,24 +1,28 @@
 #include "../Header/World.h"
 #include "../Header/Pickup.h"
-#include "../Header/SceneNode.h"
 #include "../Header/Particle.h"
 #include "../Header/ParticleNode.h"
 
+#include "SFML/Graphics/RenderTarget.hpp"
 
-World::World(sf::RenderWindow& window, FontHolder& fonts)
-	: mWindow(window)
-	, mWorldView(window.getDefaultView())
+
+World::World(sf::RenderTarget& outputTarget, FontHolder& fonts)
+	: mTarget(outputTarget)
+	, mSceneTexture(outputTarget.getSize())
+	, mWorldView(outputTarget.getDefaultView())
 	, mTextures()
 	, mFonts(fonts)
 	, mSceneGraph()
 	, mSceneLayers()
 	, mCommandQueue()
-	, mWorldBounds({ 0.f, 0.f }, { mWorldView.getSize().x, 2000.f })
+	, mWorldBounds({ 0.f, 0.f }, { mWorldView.getSize().x, 5000.f })
 	, mSpawnPosition(mWorldView.getSize().x / 2.f, 
 		mWorldBounds.size.y - mWorldView.getSize().y / 2.f)
 	, mScrollSpeed(-50.f)
 	, mPlayerAircraft(nullptr)
 	, mEnemySpawnPoints()
+	, mActiveEnemies()
+	, mBloomEffect()
 {
 	loadTextures();
 	buildScene();
@@ -52,8 +56,19 @@ void World::update(sf::Time dt)
 
 void World::draw()
 { 
-	mWindow.setView(mWorldView);
-	mWindow.draw(mSceneGraph);
+	if (PostEffect::isSupported())
+	{
+		mSceneTexture.clear();
+		mSceneTexture.setView(mWorldView);
+		mSceneTexture.draw(mSceneGraph);
+		mSceneTexture.display();
+		mBloomEffect.apply(mSceneTexture, mTarget);
+	}
+	else
+	{
+		mTarget.setView(mWorldView);
+		mTarget.draw(mSceneGraph);
+	}
 }
 
 CommandQueue& World::getCommandQueue()
@@ -77,14 +92,14 @@ void World::loadTextures()
 	mTextures.load(Textures::ID::Jungle, "Media/Textures/Jungle.png");
 	mTextures.load(Textures::ID::Particle, "Media/Textures/Particle.png");
 	mTextures.load(Textures::ID::Explosion, "Media/Textures/Explosion.png");
-
+	mTextures.load(Textures::ID::FinishLine, "Media/Textures/FinishLine.png");
 }
 
 void World::buildScene() 
 {
 	for (size_t i = 0; i < LayerCount; ++i)
 	{
-		Category::Type category = i == LowerAir ?
+		Category::Type category = (i == LowerAir) ?
 			Category::SceneAirLayer : Category::None;
 
 		SceneNode::Ptr layer(new SceneNode(category));
@@ -96,11 +111,21 @@ void World::buildScene()
 	sf::Texture& jungleTexture = mTextures.get(Textures::ID::Jungle);
 	jungleTexture.setRepeated(true);
 
+	// Allow the users to see the background while reaching the finish line
+	float viewHeight = mWorldView.getSize().y;
+	sf::IntRect textureRect(mWorldBounds);
+	textureRect.position.y += static_cast<int>(viewHeight);
+
 	std::unique_ptr<SpriteNode> jungleSprite(new SpriteNode(jungleTexture, 
 		static_cast<sf::IntRect>(mWorldBounds)));
 	jungleSprite->setPosition(mWorldBounds.position);
 	mSceneLayers[Background]
 		->attachChild(std::move(jungleSprite));
+
+	sf::Texture& finishTexture = mTextures.get(Textures::ID::FinishLine);
+	std::unique_ptr<SpriteNode> finishSprite(new SpriteNode(finishTexture));
+	finishSprite->setPosition({ mWorldBounds.position.x, -1.f * finishTexture.getSize().y });
+	mSceneLayers[Background]->attachChild(std::move(finishSprite));
 
 	std::unique_ptr<ParticleNode>smokeNode(
 		new ParticleNode(Particle::Type::Smoke, mTextures));
@@ -212,12 +237,29 @@ void World::addEnemies()
 {
 	addEnemy(Aircraft::Raptor, 0.f, 500.f);
 	addEnemy(Aircraft::Raptor, 0.f, 1000.f);
-	addEnemy(Aircraft::Raptor, +100.f, 1100.f);
-	addEnemy(Aircraft::Raptor, -100.f, 1100.f);
-	addEnemy(Aircraft::Avenger, -70.f, 1400.f);
-	addEnemy(Aircraft::Avenger, -70.f, 1600.f);
-	addEnemy(Aircraft::Avenger, 70.f, 1400.f);
-	addEnemy(Aircraft::Avenger, 70.f, 1600.f);
+	addEnemy(Aircraft::Raptor, +100.f, 1150.f);
+	addEnemy(Aircraft::Raptor, -100.f, 1150.f);
+	addEnemy(Aircraft::Avenger, 70.f, 1500.f);
+	addEnemy(Aircraft::Avenger, -70.f, 1500.f);
+	addEnemy(Aircraft::Avenger, -70.f, 1710.f);
+	addEnemy(Aircraft::Avenger, 70.f, 1700.f);
+	addEnemy(Aircraft::Avenger, 30.f, 1850.f);
+	addEnemy(Aircraft::Raptor, 300.f, 2200.f);
+	addEnemy(Aircraft::Raptor, -300.f, 2200.f);
+	addEnemy(Aircraft::Raptor, 0.f, 2200.f);
+	addEnemy(Aircraft::Raptor, 0.f, 2500.f);
+	addEnemy(Aircraft::Avenger, -300.f, 2700.f);
+	addEnemy(Aircraft::Avenger, -300.f, 2700.f);
+	addEnemy(Aircraft::Raptor, 0.f, 3000.f);
+	addEnemy(Aircraft::Raptor, 250.f, 3250.f);
+	addEnemy(Aircraft::Raptor, -250.f, 3250.f);
+	addEnemy(Aircraft::Avenger, 0.f, 3500.f);
+	addEnemy(Aircraft::Avenger, 0.f, 3700.f);
+	addEnemy(Aircraft::Raptor, 0.f, 3800.f);
+	addEnemy(Aircraft::Avenger, 0.f, 4000.f);
+	addEnemy(Aircraft::Avenger, -200.f, 4200.f);
+	addEnemy(Aircraft::Raptor, 200.f, 4200.f);
+	addEnemy(Aircraft::Raptor, 0.f, 4400.f);
 
 	std::sort(mEnemySpawnPoints.begin(), mEnemySpawnPoints.end(),
 		[](const SpawnPoint& lhs, const SpawnPoint& rhs)
