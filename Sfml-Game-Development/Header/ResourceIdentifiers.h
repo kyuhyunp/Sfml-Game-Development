@@ -6,6 +6,7 @@ namespace sf
 {
 	class Font;
 	class Texture;
+	class Shader;
 }
 
 
@@ -23,6 +24,17 @@ namespace Textures
 	};
 }
 
+namespace Shaders
+{
+	enum class ID : int
+	{
+		BrightnessPass,
+		DownSamplePass,
+		GaussianBlurPass,
+		AddPass,
+	};
+}
+
 namespace Fonts
 {
 	enum class ID : int
@@ -37,6 +49,7 @@ class ResourceHolder;
 
 typedef ResourceHolder<sf::Font, Fonts::ID> FontHolder;
 typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;
+typedef ResourceHolder<sf::Shader, Shaders::ID> ShaderHolder;
 
 
 #endif

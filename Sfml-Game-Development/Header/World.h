@@ -3,10 +3,12 @@
 
 #include "ResourceIdentifiers.h"
 #include "ResourceHolder.hpp"
+#include "SceneNode.h"
 #include "SpriteNode.h"
 #include "CommandQueue.h"
 #include "Aircraft.h"
 #include "Category.h"
+#include "BloomEffect.h"
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -16,14 +18,14 @@
 
 namespace sf
 {
-	class RenderWindow;
+	class RenderTarget;
 }
 
 
 class World
 {
 public:
-	explicit World(sf::RenderWindow& window, FontHolder& fonts);
+	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts);
 
 	// Non copyable
 	World(const World&) = delete;
@@ -75,7 +77,8 @@ private:
 		float y;
 	};
 
-	sf::RenderWindow& mWindow;
+	sf::RenderTarget& mTarget;
+	sf::RenderTexture mSceneTexture;
 	sf::View mWorldView;
 	TextureHolder mTextures;
 	FontHolder& mFonts;
@@ -91,6 +94,8 @@ private:
 
 	std::vector<SpawnPoint> mEnemySpawnPoints;
 	std::vector<Aircraft*> mActiveEnemies;
+
+	BloomEffect mBloomEffect;
 };
 
 #endif
