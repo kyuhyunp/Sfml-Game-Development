@@ -43,6 +43,15 @@ namespace Fonts
 	};
 }
 
+namespace Music
+{
+	enum class ID : int
+	{
+		MenuTheme,
+		MissionTheme
+	};
+}
+
 // Forward declaration and a few type definitions
 template <typename Resource, typename Identifier>
 class ResourceHolder;

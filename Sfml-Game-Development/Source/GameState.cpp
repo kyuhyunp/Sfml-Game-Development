@@ -1,4 +1,5 @@
 #include "../Header/GameState.h"
+#include "../Header/MusicPlayer.h"
 
 
 GameState::GameState(StateStack& stack, Context context)
@@ -7,6 +8,7 @@ GameState::GameState(StateStack& stack, Context context)
 	, mPlayer(*context.player)
 {
 	mPlayer.setMissionStatus(Player::MissionRunning);
+	context.music->play(Music::ID::MissionTheme);
 }
 
 void GameState::draw()

@@ -17,6 +17,7 @@ namespace sf
 
 class StateStack;
 class Player;
+class MusicPlayer;
 
 class State
 {
@@ -26,12 +27,13 @@ public:
 	struct Context
 	{
 		Context(sf::RenderWindow& window, TextureHolder& textures, 
-			FontHolder& fonts, Player& player);
+			FontHolder& fonts, Player& player, MusicPlayer& music);
 		
 		sf::RenderWindow* window;
 		TextureHolder* textures;
 		FontHolder* fonts;
 		Player* player;
+		MusicPlayer* music;
 	};
 
 	State(StateStack& stack, Context context);

@@ -15,6 +15,7 @@
 #include "PauseState.h"
 #include "SettingsState.h"
 #include "GameOverState.h"
+#include "MusicPlayer.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -48,11 +49,13 @@ private:
 	FontHolder& mFonts;
 	Player mPlayer;
 
+	MusicPlayer mMusic;
 	StateStack mStateStack;
 	
 	sf::Text mStatisticsText;
 	sf::Time mStatisticsUpdateTime;
 	size_t mStatisticsNumFrames;
+
 };
 
 #endif

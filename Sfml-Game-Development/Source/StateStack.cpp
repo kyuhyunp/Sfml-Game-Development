@@ -1,4 +1,5 @@
 #include "../Header/StateStack.h"
+#include "../Header/MusicPlayer.h"
 
 
 StateStack::StateStack(State::Context context)
@@ -32,6 +33,19 @@ void StateStack::draw()
 
 void StateStack::handleEvent(const sf::Event& event)
 {
+	if (const auto* keyPressed = event.getIf<sf::Event::KeyPressed>())
+	{
+		if (keyPressed->code == sf::Keyboard::Key::Z)
+		{
+			
+			mContext.music->setVolume(mContext.music->getVolume() - 1);
+		}
+		else if (keyPressed->code == sf::Keyboard::Key::X)
+		{
+
+			mContext.music->setVolume(mContext.music->getVolume() + 1);
+		}
+	}
 	for (auto itr = mStack.rbegin(); itr != mStack.rend(); ++itr)
 	{
 		if (!(*itr)->handleEvent(event))
