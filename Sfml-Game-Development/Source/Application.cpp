@@ -2,6 +2,8 @@
 #include "../Header/Utility.hpp"
 #include "../Header/ResourceHolder.hpp"
 
+#include <iostream>
+
 
 const sf::Time Application::TimePerFrame = sf::seconds(1.f/60.f);
 
@@ -10,7 +12,8 @@ Application::Application(FontHolder& fonts)
 	, mTextures()
 	, mFonts(fonts)
 	, mPlayer()
-	, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer))
+	, mMusic()
+	, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer, mMusic))
 	, mStatisticsText(fonts.get(Fonts::ID::Sansation))
 	, mStatisticsUpdateTime(sf::Time::Zero)
 	, mStatisticsNumFrames(0)
@@ -25,6 +28,8 @@ Application::Application(FontHolder& fonts)
 
 	registerStates();
 	mStateStack.pushState(States::Title);
+
+	mMusic.setVolume(25.f);
 }
 
 void Application::run()
@@ -98,6 +103,8 @@ void Application::updateStatistics(sf::Time dt)
 		mStatisticsText.setString("FPS: " + toString(mStatisticsNumFrames));
 		mStatisticsUpdateTime -= sf::seconds(1.f);
 		mStatisticsNumFrames = 0;
+
+		std::cout << mMusic.getVolume() << std::endl;
 	}
 }
 

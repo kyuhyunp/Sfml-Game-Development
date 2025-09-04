@@ -3,6 +3,8 @@
 #include "../Header/Utility.hpp"
 #include "../Header/ResourceHolder.hpp"
 #include "../Header/Button.h"
+#include "../Header/MusicPlayer.h"
+
 
 #include <memory>
 
@@ -38,6 +40,13 @@ PauseState::PauseState(StateStack& stack, Context context)
 
 	mGUIContainer.pack(returnButton);
 	mGUIContainer.pack(backToMenuButton);
+
+	context.music->setPaused(true);
+}
+
+PauseState::~PauseState()
+{
+	getContext().music->setPaused(false);
 }
 
 void PauseState::draw()
