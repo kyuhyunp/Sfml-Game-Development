@@ -1,10 +1,14 @@
 #include "../Header/MusicPlayer.h"
 
+#include <iostream>
 
 MusicPlayer::MusicPlayer()
 	: mMusic()
 	, mFilenames()
 {
+	mMusic.setRelativeToListener(true);
+	mMusic.setAttenuation(0.f);
+
 	mFilenames[Music::ID::MenuTheme] = "Media/Music/MenuTheme.ogg";
 	mFilenames[Music::ID::MissionTheme] = "Media/Music/MissionTheme.ogg";
 }
@@ -45,4 +49,20 @@ void MusicPlayer::setVolume(float volume)
 float MusicPlayer::getVolume() const
 {
 	return mMusic.getVolume();
+}
+
+void MusicPlayer::printStatus() const
+{
+	switch (mMusic.getStatus())
+	{
+	case sf::Music::Status::Paused:
+		std::cout << "Paused\n";
+		break;
+	case sf::Music::Status::Playing :
+		std::cout << "Playing\n";
+		break;
+	case sf::Music::Status::Stopped:
+		std::cout << "Stopped\n";
+		break;
+	}
 }

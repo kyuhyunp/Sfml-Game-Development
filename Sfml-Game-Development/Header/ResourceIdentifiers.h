@@ -7,6 +7,7 @@ namespace sf
 	class Font;
 	class Texture;
 	class Shader;
+	class SoundBuffer;
 }
 
 
@@ -43,6 +44,20 @@ namespace Fonts
 	};
 }
 
+namespace SoundEffect
+{
+	enum class ID : int
+	{
+		AlliedGunfire,
+		EnemyGunfire,
+		Explosion1,
+		Explosion2,
+		LaunchMissile,
+		CollectPickup,
+		Button,
+	};
+}
+
 namespace Music
 {
 	enum class ID : int
@@ -59,6 +74,6 @@ class ResourceHolder;
 typedef ResourceHolder<sf::Font, Fonts::ID> FontHolder;
 typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;
 typedef ResourceHolder<sf::Shader, Shaders::ID> ShaderHolder;
-
+typedef ResourceHolder<sf::SoundBuffer, SoundEffect::ID> SoundBufferHolder;
 
 #endif

@@ -2,16 +2,20 @@
 #include "../Header/Pickup.h"
 #include "../Header/Particle.h"
 #include "../Header/ParticleNode.h"
+#include "../Header/SoundNode.h"
+
+#include <iostream>
 
 #include "SFML/Graphics/RenderTarget.hpp"
 
 
-World::World(sf::RenderTarget& outputTarget, FontHolder& fonts)
+World::World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds)
 	: mTarget(outputTarget)
 	, mSceneTexture(outputTarget.getSize())
 	, mWorldView(outputTarget.getDefaultView())
 	, mTextures()
 	, mFonts(fonts)
+	, mSounds(sounds)
 	, mSceneGraph()
 	, mSceneLayers()
 	, mCommandQueue()
@@ -52,6 +56,8 @@ void World::update(sf::Time dt)
 
 	mSceneGraph.update(dt, mCommandQueue);
 	adaptPlayerPosition();
+
+	updateSounds();
 }
 
 void World::draw()
@@ -134,6 +140,9 @@ void World::buildScene()
 	std::unique_ptr<ParticleNode>propellantNode(
 		new ParticleNode(Particle::Type::Propellant, mTextures));
 	mSceneLayers[LowerAir]->attachChild(std::move(propellantNode));
+
+	std::unique_ptr<SoundNode> soundNode(new SoundNode(mSounds));
+	mSceneGraph.attachChild(std::move(soundNode));
 
 	std::unique_ptr<Aircraft> player(new Aircraft(Aircraft::Eagle, mFonts, mTextures));
 	mPlayerAircraft = player.get();
@@ -220,6 +229,8 @@ void World::handleCollisions()
 
 			pickup.apply(player);
 			pickup.destroy();
+
+			player.playLocalSound(mCommandQueue, SoundEffect::ID::CollectPickup);
 		}
 		else if (matchesCategories(pair, Category::PlayerAircraft, Category::EnemyProjectile)
 			|| matchesCategories(pair, Category::EnemyAircraft, Category::AlliedProjectile))
@@ -231,6 +242,12 @@ void World::handleCollisions()
 			projectile.destroy();
 		}
 	}
+}
+
+void World::updateSounds()
+{
+	mSounds.setListenerPosition(mPlayerAircraft->getWorldPosition());
+	mSounds.removeSounds();
 }
 
 void World::addEnemies()

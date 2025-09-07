@@ -1,13 +1,16 @@
 #include "../Header/GameState.h"
 #include "../Header/MusicPlayer.h"
 
+#include <iostream>
+
 
 GameState::GameState(StateStack& stack, Context context)
 	: State(stack, context)
-	, mWorld(*context.window, *context.fonts)
+	, mWorld(*context.window, *context.fonts, *context.sounds)
 	, mPlayer(*context.player)
 {
 	mPlayer.setMissionStatus(Player::MissionRunning);
+
 	context.music->play(Music::ID::MissionTheme);
 }
 

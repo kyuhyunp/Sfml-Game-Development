@@ -1,5 +1,6 @@
 #include "../Header/Button.h"
 #include "../Header/Utility.hpp"
+#include "../Header/SoundPlayer.h"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
@@ -8,11 +9,12 @@
 
 namespace GUI
 {
-	Button::Button(const FontHolder& fonts, const TextureHolder& textures)
+	Button::Button(State::Context &context)
 		: mCallback()
-		, mSprite(textures.get(Textures::ID::Buttons))
-		, mText(fonts.get(Fonts::ID::Sansation), "", 16)
+		, mSprite(context.textures->get(Textures::ID::Buttons))
+		, mText(context.fonts->get(Fonts::ID::Sansation), "", 16)
 		, mIsToggle(false)
+		, mSounds(*context.sounds)
 	{
 		changeTexture(Normal);
 
@@ -71,6 +73,8 @@ namespace GUI
 		{
 			deactivate();
 		}
+
+		mSounds.play(SoundEffect::ID::Button);
 	}
 
 	void Button::deactivate()

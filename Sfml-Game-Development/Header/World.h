@@ -9,6 +9,7 @@
 #include "Aircraft.h"
 #include "Category.h"
 #include "BloomEffect.h"
+#include "SoundPlayer.h"
 
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Texture.hpp>
@@ -25,7 +26,7 @@ namespace sf
 class World
 {
 public:
-	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts);
+	explicit World(sf::RenderTarget& outputTarget, FontHolder& fonts, SoundPlayer& sounds);
 
 	// Non copyable
 	World(const World&) = delete;
@@ -44,6 +45,7 @@ private:
 	void adaptPlayerVelocity();
 	void adaptPlayerPosition();
 	void handleCollisions();
+	void updateSounds();
 
 	void buildScene();
 	void addEnemies();
@@ -82,6 +84,7 @@ private:
 	sf::View mWorldView;
 	TextureHolder mTextures;
 	FontHolder& mFonts;
+	SoundPlayer& mSounds;
 
 	SceneNode mSceneGraph;
 	std::array<SceneNode*, LayerCount> mSceneLayers;
