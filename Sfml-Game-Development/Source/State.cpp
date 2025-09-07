@@ -3,12 +3,13 @@
 
 
 State::Context::Context(sf::RenderWindow& window, TextureHolder& textures,
-	FontHolder& fonts, Player& player, MusicPlayer& music)
+	FontHolder& fonts, Player& player, MusicPlayer& music, SoundPlayer& sounds)
 	: window(&window)
 	, textures(&textures)
 	, fonts(&fonts)
 	, player(&player)
 	, music(&music)
+	, sounds(&sounds)
 {
 }
 

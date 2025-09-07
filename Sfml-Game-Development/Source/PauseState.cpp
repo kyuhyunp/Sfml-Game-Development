@@ -23,14 +23,14 @@ PauseState::PauseState(StateStack& stack, Context context)
 	sf::Vector2f pausePosition = { 0.5f * viewSize.x,  0.4f * viewSize.y };
 	mPauseText.setPosition(pausePosition);
 
-	auto returnButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto returnButton = std::make_shared<GUI::Button>(context);
 	returnButton->setPosition({ pausePosition.x - 100, pausePosition.y + 75.f });
 	returnButton->setText("Return");
 	returnButton->setCallback([this]() {
 		requestStackPop();
 	});
 
-	auto backToMenuButton = std::make_shared<GUI::Button>(*context.fonts, *context.textures);
+	auto backToMenuButton = std::make_shared<GUI::Button>(context);
 	backToMenuButton->setPosition({ pausePosition.x - 100, pausePosition.y + 125.f });
 	backToMenuButton->setText("Back to menu");
 	backToMenuButton->setCallback([this]() {

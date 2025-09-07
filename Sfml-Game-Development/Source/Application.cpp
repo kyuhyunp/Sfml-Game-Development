@@ -12,8 +12,9 @@ Application::Application(FontHolder& fonts)
 	, mTextures()
 	, mFonts(fonts)
 	, mPlayer()
+	, mSounds()
 	, mMusic()
-	, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer, mMusic))
+	, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer, mMusic, mSounds))
 	, mStatisticsText(fonts.get(Fonts::ID::Sansation))
 	, mStatisticsUpdateTime(sf::Time::Zero)
 	, mStatisticsNumFrames(0)
@@ -103,8 +104,6 @@ void Application::updateStatistics(sf::Time dt)
 		mStatisticsText.setString("FPS: " + toString(mStatisticsNumFrames));
 		mStatisticsUpdateTime -= sf::seconds(1.f);
 		mStatisticsNumFrames = 0;
-
-		std::cout << mMusic.getVolume() << std::endl;
 	}
 }
 

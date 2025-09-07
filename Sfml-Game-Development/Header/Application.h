@@ -15,11 +15,13 @@
 #include "PauseState.h"
 #include "SettingsState.h"
 #include "GameOverState.h"
+#include "SoundPlayer.h"
 #include "MusicPlayer.h"
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
+
 
 
 class Application
@@ -49,6 +51,7 @@ private:
 	FontHolder& mFonts;
 	Player mPlayer;
 
+	SoundPlayer mSounds;
 	MusicPlayer mMusic;
 	StateStack mStateStack;
 	

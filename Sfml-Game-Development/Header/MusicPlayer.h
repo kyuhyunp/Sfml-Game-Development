@@ -26,6 +26,8 @@ public:
 
 	float getVolume() const;
 
+	void printStatus() const;
+
 private:
 	sf::Music mMusic;
 	std::map<Music::ID, std::string> mFilenames;
