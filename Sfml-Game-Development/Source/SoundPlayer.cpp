@@ -64,7 +64,7 @@ void SoundPlayer::play(SoundEffect::ID effect, sf::Vector2f position)
 	sound.play();
 }
 
-void SoundPlayer::removeSounds()
+void SoundPlayer::removeStoppedSounds()
 {
 	remove_if(mSounds.begin(), mSounds.end(), [](const sf::Sound& sound)
 		{

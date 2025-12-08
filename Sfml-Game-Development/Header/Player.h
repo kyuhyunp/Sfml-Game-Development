@@ -1,26 +1,21 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "CommandQueue.h"
+#include "Command.h"
+#include "KeyBinding.h"
+
 #include <SFML/Window/Event.hpp>
+#include <SFML/Network/TcpSocket.hpp>
 
 #include <map>
 
+// To Delete: Used to include CommandQueue
+class CommandQueue;
 
 class Player
 {
 public:
-
-	enum Action 
-	{
-		MoveLeft,
-		MoveRight,
-		MoveUp,
-		MoveDown,
-		Fire,
-		LaunchMissile,
-		ActionCount
-	};
+	typedef PlayerAction::Type Action;
 
 	enum MissionStatus
 	{
@@ -29,24 +24,32 @@ public:
 		MissionFailure
 	};
 
-	Player();
+	Player(sf::TcpSocket* socket, int32_t identifier, const KeyBinding* binding);
 
 	void handleEvent(const sf::Event& event, CommandQueue& commands);
 	void handleRealtimeInput(CommandQueue& commands);
-	void assignKey(Action action, sf::Keyboard::Key key);
-	sf::Keyboard::Key getAssignedKey(Action action) const;
+	void handleRealtimeNetworkInput(CommandQueue& commands);
+
+	// React to events or realtime state changes received over the network
+	void handleNetworkEvent(Action action, CommandQueue& commands);
+	void handleNetworkRealtimeChange(Action action, bool actionEnabled);
 
 	void setMissionStatus(MissionStatus status);
 	MissionStatus getMissionStatus() const;
 
+	void disableAllRealtimeActions();
+	bool isLocal() const;
+
 private:
-	static bool isRealtimeAction(Action action);
-
 	void initializeActions();
+	void sendRealtimePacket(Player::Action action, bool isPressed);
 
-	std::map<sf::Keyboard::Key, Action> mKeyBinding;
+	const KeyBinding* mKeyBinding;
 	std::map<Action, Command> mActionBinding;
+	std::map<Action, bool> mActionProxies;
 	MissionStatus mCurrentMissionStatus;
+	int32_t mIdentifier;
+	sf::TcpSocket* mSocket;
 };
 
 

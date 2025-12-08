@@ -20,12 +20,12 @@ public:
 
 private:
 	void updateLabels();
-	void addButtonLabel(Player::Action action, float y, const std::string& text, Context context);
+	void addButtonLabel(size_t index, size_t x, size_t y, const std::string& text, Context context);
 
 	sf::Sprite mBackgroundSprite;
 	GUI::Container mGUIContainer;
-	std::array<GUI::Button::Ptr, Player::ActionCount> mBindingButtons;
-	std::array<GUI::Label::Ptr, Player::ActionCount> mBindingLabels;
+	std::array<GUI::Button::Ptr, 2 * PlayerAction::Count> mBindingButtons;
+	std::array<GUI::Label::Ptr, 2 * PlayerAction::Count> mBindingLabels;
 };
 
 #endif

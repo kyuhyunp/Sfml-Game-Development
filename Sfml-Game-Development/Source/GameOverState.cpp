@@ -8,11 +8,9 @@
 #include <SFML/Graphics/View.hpp>
 
 
-GameOverState::GameOverState(StateStack& stack, Context context)
+GameOverState::GameOverState(StateStack& stack, Context context, const std::string& text)
 	: State(stack, context)
-	, mGameOverText(context.fonts->get(Fonts::ID::Sansation), 
-		State::getContext().player->getMissionStatus() == Player::MissionSuccess ? 
-		"Mission successful!" : "Mission failed!", 70)
+	, mGameOverText(context.fonts->get(Fonts::ID::Sansation), text, 70)
 	, mElapsedTime(sf::Time::Zero)
 {
 	centerOrigin(mGameOverText);

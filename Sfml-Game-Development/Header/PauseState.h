@@ -13,7 +13,7 @@
 class PauseState : public State
 {
 public:
-	PauseState(StateStack& stack, Context context);
+	PauseState(StateStack& stack, Context context, bool letUpdatesThrough = false);
 	~PauseState();
 
 	virtual void draw();
@@ -23,6 +23,7 @@ public:
 private:
 	sf::Text mPauseText;
 	GUI::Container mGUIContainer;
+	bool mLetUpdatesThrough;
 };
 
 #endif

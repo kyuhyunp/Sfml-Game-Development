@@ -6,9 +6,10 @@
 
 GameState::GameState(StateStack& stack, Context context)
 	: State(stack, context)
-	, mWorld(*context.window, *context.fonts, *context.sounds)
-	, mPlayer(*context.player)
+	, mWorld(*context.window, *context.fonts, *context.sounds, false)
+	, mPlayer(nullptr, 1, context.keys1)
 {
+	mWorld.addAircraft(1);
 	mPlayer.setMissionStatus(Player::MissionRunning);
 
 	context.music->play(Music::ID::MissionTheme);
@@ -23,16 +24,16 @@ bool GameState::update(sf::Time dt)
 {
 	mWorld.update(dt);
 
-	if (mWorld.hasPlayerReachedEnd())
-	{
-		mPlayer.setMissionStatus(Player::MissionSuccess);
-		requestStackPush(States::GameOver);
-	}
-
 	if (!mWorld.hasAlivePlayer())
 	{
 		mPlayer.setMissionStatus(Player::MissionFailure);
 		requestStackPush(States::GameOver);
+	}
+
+	if (mWorld.hasPlayerReachedEnd())
+	{
+		mPlayer.setMissionStatus(Player::MissionSuccess);
+		requestStackPush(States::MissionSuccess);
 	}
 
 	CommandQueue& commands = mWorld.getCommandQueue();

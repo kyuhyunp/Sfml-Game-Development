@@ -4,6 +4,9 @@
 #include "../Header/ResourceHolder.hpp"
 #include "../Header/Pickup.h"
 #include "../Header/SoundNode.h"
+#include "../Header/CommandQueue.h"
+#include "../Header/NetworkNode.h"
+#include "../Header/NetworkProtocol.h"
 
 #include "cmath"
 #include <functional>
@@ -29,15 +32,18 @@ Aircraft::Aircraft(Type type, const FontHolder& fonts, const TextureHolder& text
 	, mIsFiring(false)
 	, mIsLaunchingMissile(false)
 	, mShowExplosion(true)
-	, mPlayedExplosionSound(false)
+	, mExplosionBegan(false)
 	, mSpawnedPickup(false)
+	, mPickupsEnabled(true)
 	, mFireRateLevel(1)
 	, mSpreadLevel(1)
 	, mMissileAmmo(2)
+	, mDropPickupCommand()
 	, mTravelledDistance(0.f)
 	, mDirectionIndex(0)
 	, mHealthDisplay(nullptr)
 	, mMissileDisplay(nullptr)
+	, mIdentifier(0)
 {
 	mExplosion.setFrameSize(sf::Vector2i(256, 256));
 	mExplosion.setNumFrames(16);
@@ -91,6 +97,11 @@ void Aircraft::drawCurrent(sf::RenderTarget& target, sf::RenderStates states) co
 	}
 }
 
+void Aircraft::disablePickups()
+{
+	mPickupsEnabled = false;
+}
+
 void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	updateTexts();
@@ -101,12 +112,29 @@ void Aircraft::updateCurrent(sf::Time dt, CommandQueue& commands)
 		checkPickupDrop(commands);
 		mExplosion.update(dt);
 		
-		if (!mPlayedExplosionSound)
+		if (!mExplosionBegan)
 		{
 			SoundEffect::ID soundEffect = rand() % 2 == 0 ? SoundEffect::ID::Explosion1 
 				: SoundEffect::ID::Explosion2;
 			playLocalSound(commands, soundEffect);
-			mPlayedExplosionSound = true;
+
+			if (!isAllied())
+			{
+				// position is sent because this aircraft will be destroyed
+				sf::Vector2f position = getWorldPosition();
+
+				Command command;
+				command.category = Category::Network;
+				command.action =
+					derivedAction<NetworkNode>([position](NetworkNode& node, sf::Time)
+						{
+							node.notifyGameAction(GameActions::EnemyExplode, position);
+						});
+
+				commands.push(command);
+			}
+
+			mExplosionBegan = true;
 		}
 		return;
 	}
@@ -202,6 +230,26 @@ void Aircraft::playLocalSound(CommandQueue& commands, SoundEffect::ID effect)
 	commands.push(command);
 }
 
+int32_t Aircraft::getIdentifier()
+{
+	return mIdentifier;
+}
+
+void Aircraft::setIdentifier(int32_t identifier)
+{
+	mIdentifier = identifier;
+}
+
+int32_t Aircraft::getMissileAmmo() const
+{
+	return mMissileAmmo;
+}
+
+void Aircraft::setMissileAmmo(int ammo)
+{
+	mMissileAmmo = ammo;
+}
+
 void Aircraft::updateMovementPattern(sf::Time dt)
 {
 	const std::vector<Direction>& directions = Table[mType].directions;
@@ -226,7 +274,7 @@ void Aircraft::updateMovementPattern(sf::Time dt)
 
 void Aircraft::checkPickupDrop(CommandQueue& commands)
 {
-	if (!isAllied() && rand() % 3 == 0 && !mSpawnedPickup)
+	if (!isAllied() && rand() % 3 == 0 && !mSpawnedPickup && mPickupsEnabled)
 	{
 		commands.push(mDropPickupCommand);
 	}
@@ -252,16 +300,17 @@ void Aircraft::checkProjectileLaunch(sf::Time dt, CommandQueue& commands)
 		mFireCountdown += Table[mType].fireInterval / (mFireRateLevel + 1.f);
 		mIsFiring = false;
 	}
+
 	else if (mFireCountdown > sf::Time::Zero)
 	{
 		mFireCountdown -= dt;
-		if (mFireCountdown < sf::Time::Zero)
-		{
-			mFireCountdown = sf::Time::Zero;
-		}
-		/*
-		* Without the below line, there is a chance of another bullet firing
-		* because there is a chance of space pressed for the next dt
+
+		/* 
+			Shortly after, mIsFiring becomes true again because 
+			void Player::handleRealtimeInput(CommandQueue& commands)
+			checks sf::Keyboard::isKeyPressed() and calls void Aircraft::fire()
+
+			However, use realtime action to allow continuous firing
 		*/
 		mIsFiring = false;
 	}
