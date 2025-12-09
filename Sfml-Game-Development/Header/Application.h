@@ -3,7 +3,7 @@
 
 #include "ResourceHolder.hpp"
 #include "ResourceIdentifiers.h"
-#include "Player.h"
+#include "KeyBinding.h"
 #include "StateStack.h"
 #include "Utility.hpp"
 
@@ -15,6 +15,7 @@
 #include "PauseState.h"
 #include "SettingsState.h"
 #include "GameOverState.h"
+#include "MultiplayerGameState.h"
 #include "SoundPlayer.h"
 #include "MusicPlayer.h"
 
@@ -49,10 +50,11 @@ private:
 	sf::RenderWindow mWindow;
 	TextureHolder mTextures;
 	FontHolder& mFonts;
-	Player mPlayer;
-
 	SoundPlayer mSounds;
 	MusicPlayer mMusic;
+
+	KeyBinding mKeyBinding1;
+	KeyBinding mKeyBinding2;
 	StateStack mStateStack;
 	
 	sf::Text mStatisticsText;

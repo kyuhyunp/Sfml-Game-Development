@@ -28,6 +28,7 @@ public:
 	virtual bool isMarkedForRemoval() const;
 	bool isAllied() const;
 	float getMaxSpeed() const;
+	void disablePickups();
 
 	void increaseSpread();
 	void increaseFireRate();
@@ -36,6 +37,10 @@ public:
 	void fire();
 	void launchMissile();
 	void playLocalSound(CommandQueue& commands, SoundEffect::ID effect);
+	int32_t getIdentifier();
+	void setIdentifier(int32_t identifier);
+	int32_t getMissileAmmo() const;
+	void setMissileAmmo(int ammo);
 
 private:
 	virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -64,17 +69,20 @@ private:
 	bool mIsFiring;
 	bool mIsLaunchingMissile;
 	bool mShowExplosion;
-	bool mPlayedExplosionSound;
+	bool mExplosionBegan;
 	bool mSpawnedPickup;
+	bool mPickupsEnabled;
 
 	int mFireRateLevel;
 	int mSpreadLevel;
-	int mMissileAmmo;
+	int32_t mMissileAmmo;
 
 	float mTravelledDistance;
 	size_t mDirectionIndex;
 	TextNode* mHealthDisplay;
 	TextNode* mMissileDisplay;
+
+	int32_t mIdentifier;
 };
 
 #endif

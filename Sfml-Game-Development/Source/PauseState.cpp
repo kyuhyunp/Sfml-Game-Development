@@ -9,10 +9,11 @@
 #include <memory>
 
 
-PauseState::PauseState(StateStack& stack, Context context)
+PauseState::PauseState(StateStack& stack, Context context, bool letUpdatesThrough) 
 	: State(stack, context)
 	, mPauseText(context.fonts->get(Fonts::ID::Sansation))
 	, mGUIContainer()
+	, mLetUpdatesThrough(letUpdatesThrough) 
 { 
 	sf::Vector2f viewSize = context.window->getView().getSize();
 
@@ -63,9 +64,9 @@ void PauseState::draw()
 	window.draw(mGUIContainer);
 }
 
-bool PauseState::update(sf::Time dt)
-{
-	return false;
+bool PauseState::update(sf::Time)
+{ 
+	return mLetUpdatesThrough;
 }
 
 bool PauseState::handleEvent(const sf::Event& event)

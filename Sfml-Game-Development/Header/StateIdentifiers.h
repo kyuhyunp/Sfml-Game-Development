@@ -10,8 +10,12 @@ namespace States
 		Menu,
 		Game,
 		Pause,
+		NetworkPause,
 		Settings,
 		GameOver,
+		MissionSuccess,
+		HostGame,
+		JoinGame,
 	};
 }
 

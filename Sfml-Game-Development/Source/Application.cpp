@@ -11,10 +11,12 @@ Application::Application(FontHolder& fonts)
 	: mWindow(sf::VideoMode({ 1024, 768 }), "States", sf::Style::Close)
 	, mTextures()
 	, mFonts(fonts)
-	, mPlayer()
 	, mSounds()
 	, mMusic()
-	, mStateStack(State::Context(mWindow, mTextures, mFonts, mPlayer, mMusic, mSounds))
+	, mKeyBinding1(1)
+	, mKeyBinding2(2)
+	, mStateStack(State::Context(mWindow, mTextures, mFonts, mMusic, mSounds, 
+		mKeyBinding1, mKeyBinding2))
 	, mStatisticsText(fonts.get(Fonts::ID::Sansation))
 	, mStatisticsUpdateTime(sf::Time::Zero)
 	, mStatisticsNumFrames(0)
@@ -113,6 +115,10 @@ void Application::registerStates()
 	mStateStack.registerState<MenuState>(States::Menu);
 	mStateStack.registerState<GameState>(States::Game);
 	mStateStack.registerState<PauseState>(States::Pause);
+	mStateStack.registerState<PauseState>(States::NetworkPause, true);
 	mStateStack.registerState<SettingsState>(States::Settings);
-	mStateStack.registerState<GameOverState>(States::GameOver);
+	mStateStack.registerState<GameOverState>(States::GameOver, "Mission failed!");
+	mStateStack.registerState<GameOverState>(States::MissionSuccess, "Mission successful!");
+	mStateStack.registerState<MultiplayerGameState>(States::HostGame, true);
+	mStateStack.registerState<MultiplayerGameState>(States::JoinGame, false);
 }

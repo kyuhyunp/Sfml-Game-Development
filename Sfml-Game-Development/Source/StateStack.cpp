@@ -33,19 +33,6 @@ void StateStack::draw()
 
 void StateStack::handleEvent(const sf::Event& event)
 {
-	if (const auto* keyPressed = event.getIf<sf::Event::KeyPressed>())
-	{
-		if (keyPressed->code == sf::Keyboard::Key::Z)
-		{
-			
-			mContext.music->setVolume(mContext.music->getVolume() - 1);
-		}
-		else if (keyPressed->code == sf::Keyboard::Key::X)
-		{
-
-			mContext.music->setVolume(mContext.music->getVolume() + 1);
-		}
-	}
 	for (auto itr = mStack.rbegin(); itr != mStack.rend(); ++itr)
 	{
 		if (!(*itr)->handleEvent(event))
@@ -93,15 +80,30 @@ void StateStack::applyPendingChanges()
 		{
 		case Push:
 			mStack.push_back(createState(change.stateID));
+			mStack.back()->onActivate();
 			break;
 		case Pop:
+			assert(!mStack.empty());
+
+			mStack.back()->onDestroy();
 			mStack.pop_back();
+			if (!mStack.empty())
+			{
+				mStack.back()->onActivate();
+			}
+
 			break;
 		case Clear:
-			mStack.clear();
+			while (!mStack.empty())
+			{
+				mStack.back()->onDestroy();
+				mStack.pop_back();
+			}
+
 			break;
 		}
 	}
+
 
 	mPendingList.clear();
 }

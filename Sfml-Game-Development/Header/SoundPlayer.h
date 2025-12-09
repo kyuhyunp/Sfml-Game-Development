@@ -23,7 +23,7 @@ public:
 	void play(SoundEffect::ID effect);
 	void play(SoundEffect::ID effect, sf::Vector2f position);
 
-	void removeSounds();
+	void removeStoppedSounds();
 	void setListenerPosition(sf::Vector2f position);
 	sf::Vector2f getListenerPosition() const;
 
