@@ -79,11 +79,6 @@ void StateStack::applyPendingChanges()
 		switch (change.action)
 		{
 		case Push:
-			if (!mStack.empty())
-			{
-				mStack.back()->onDestroy();
-			}
-
 			mStack.push_back(createState(change.stateID));
 			mStack.back()->onActivate();
 			break;

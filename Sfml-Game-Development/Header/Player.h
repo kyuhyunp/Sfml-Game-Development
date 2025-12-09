@@ -9,7 +9,7 @@
 
 #include <map>
 
-// To Delete: Used to include CommandQueue
+
 class CommandQueue;
 
 class Player
